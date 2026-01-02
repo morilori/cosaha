@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cosaha — Gallery</title>
+    <link rel="icon" href="Icon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Sora:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+      /* base font-size: adjust to scale the whole UI */
+      :root{--ui-size:0.9375rem; --headline-size:2rem; --accent:#C34E4E; --select-width:11rem; --control-height:2.25rem}
+      html{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+      html,body{height:100%;margin:0;background:#ffffff}
+      .wrap{max-width:75rem;margin:2.25rem auto;padding:1.125rem}
+      .logo-bar{display:flex;align-items:center;justify-content:center;margin:0 0 1.5rem}
+      .logo{height:6.25rem;width:auto;display:block}
+      h1{font-weight:600;margin:0 0 0.5rem;font-size:var(--headline-size)}
+      p.phi{margin:0 0 1rem 0;color:#6b6a66;max-width:none;width:100%;font-size:var(--ui-size)}
+      .controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.625rem;margin:0.625rem 0 1.25rem}
+      .controls label{font-size:var(--ui-size);color:#595853}
+      .controls select{appearance:none;padding:0 0.75rem;border:0.0625rem solid #e7e3dc;border-radius:0;background:#fff;font-size:var(--ui-size);height:var(--control-height);display:inline-flex;align-items:center}
+      .controls select:focus, .controls select:active, .controls select:focus-visible{
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(195,78,78,0.12);
+      }
+      /* also use accent on hover */
+      .controls select:hover{
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(195,78,78,0.06);
+      }
+      /* custom select fallback styles (we will construct a custom control in JS) */
+      .custom-select{position:relative;display:inline-block}
+      .custom-select-button{background:#fff;border:0.0625rem solid #e7e3dc;border-radius:0;padding:0 0.75rem;font-size:var(--ui-size);display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;min-width:var(--select-width);max-width:var(--select-width);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:var(--control-height);}
+      .custom-select-button:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(195,78,78,0.12)}
+      .custom-select-list{position:absolute;right:0;left:0;margin-top:0.25rem;background:#fff;border:0.0625rem solid #e7e3dc;z-index:80;max-height:20rem;overflow:auto}
+      .custom-select-item{padding:0.5rem 0.75rem;cursor:pointer}
+      .custom-select-item:hover{background:var(--accent);color:#fff}
+      /* attempt to tint option hover where supported */
+      .controls select option:hover{ background: rgba(195,78,78,0.06); }
+      /* MS expand arrow color tweak */
+      .controls select::-ms-expand{ color:var(--accent); }
+      /* grid: maximum 4 columns, responsive down to 1 */
+      .top-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-bottom:0.875rem}
+      .bottom-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-top:1.25rem}
+      .grid{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem}
+      @media (max-width:64rem){
+        .grid{grid-template-columns:repeat(3,minmax(12.5rem,1fr));}
+      }
+      @media (max-width:48rem){
+        .grid{grid-template-columns:repeat(2,minmax(12.5rem,1fr));}
+      }
+      @media (max-width:32.5rem){
+        .grid{grid-template-columns:repeat(1,minmax(12.5rem,1fr));}
+      }
+      /* match artwork cell appearance and force square aspect */
+      .logo-item, .headline-item, .text-item{
+        background:#fff;
+        border:0.0625rem solid #efece6;
+        border-radius:0; /* square corners */
+        overflow:hidden;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:0.5rem;
+        aspect-ratio:1/1;
+      }
+      /* logo should fill the whole cell */
+      .logo-item{padding:0;border:0}
+      .logo-icon{width:100%;height:100%;object-fit:cover;display:block}
+      .headline-item h1{margin:0;font-size:var(--headline-size);text-align:left}
+      .headline-item{justify-content:flex-start;padding-left:0.75rem;border:0}
+      .text-item{border:0;display:flex;align-items:flex-end;padding-left:0.75rem;padding-right:0.75rem}
+      .text-item .phi{margin:0;font-size:var(--ui-size);padding:0 0.5rem}
+      .text-item .title{display:block}
+      .text-item .meta{display:block;color:#6b6a66}
+      /* text position variants when text appears left or right of artwork */
+      .text-item.side-right{justify-content:flex-start;padding-left:0.75rem;padding-right:0.5rem}
+      .text-item.side-right .phi{text-align:left}
+      .text-item.side-left{justify-content:flex-end;padding-right:0.75rem;padding-left:0.5rem}
+      .text-item.side-left .phi{text-align:right}
+      .text-item .title{font-weight:600;margin-bottom:0.25rem;font-size:var(--ui-size)}
+      .text-item .meta{font-size:var(--ui-size);color:#6b6a66}
+      /* single philosophy cell (one tile) */
+      .philosophy-item{background:#fff;border:0;overflow:hidden;display:flex;align-items:center;justify-content:flex-start;padding:0.75rem;aspect-ratio:1/1}
+      .philosophy-item .phi{font-size:var(--ui-size);text-align:left;margin:0}
+      /* controls inside a tile */
+      .controls-item{background:#fff;border:0;display:flex;align-items:center;justify-content:center;padding:0.5rem;aspect-ratio:1/1}
+      .controls-item .controls{width:100%;display:flex;align-items:center;justify-content:flex-start;padding-left:0.5rem}
+      /* bottom-row cells share the same look as other tiles */
+      .bottom-row .cell-like{background:#fff;border:0;border-radius:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:0.75rem;aspect-ratio:1/1}
+      .contact-form{width:100%;display:flex}
+      .contact-form form{display:flex;flex-direction:column;gap:0.5rem;width:100%}
+      .contact-form input,.contact-form textarea{width:100%;box-sizing:border-box;font-size:var(--ui-size);padding:0.5rem;border:0.0625rem solid #eee;border-radius:0;background:#fff;transition:box-shadow 120ms ease,border-color 120ms ease;font-family:inherit}
+      .contact-form input::placeholder,.contact-form textarea::placeholder{font-family:inherit;color:#777}
+      .contact-form textarea{min-height:6.5rem;resize:vertical}
+      .contact-form input:hover,.contact-form textarea:hover,
+      .contact-form input:focus,.contact-form textarea:focus,
+      .contact-form input:focus-visible,.contact-form textarea:focus-visible{
+        outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(195,78,78,0.08)
+      }
+      .contact-form button{font-size:var(--ui-size);padding:0 0.75rem;border:0;border-radius:0;background:var(--accent);color:#fff;cursor:pointer;width:100%;box-sizing:border-box;display:inline-block;height:var(--control-height);line-height:var(--control-height);text-align:center}
+      .contact-form button:hover{background:#a93b3b}
+      .contact-form .error{color:#b33;font-size:0.85rem}
+      .cell{background:#fff;border:0.0625rem solid #efece6;border-radius:0;overflow:hidden;display:block}
+      .cell img{width:100%;height:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+      .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,8,8,0.6);z-index:60}
+      .modal.open{display:flex}
+      .modal-nav{position:fixed;top:50%;transform:translateY(-50%);background:transparent;border:0;color:#fff;font-size:1.5rem;padding:0.5rem;cursor:pointer;z-index:70}
+      #modal-prev{left:1rem}
+      #modal-next{right:1rem}
+      .modal img{max-width:92vw;max-height:88vh;box-shadow:0 1.875rem 5rem rgba(0,0,0,0.5);border-radius:0}
+      .caption{position:fixed;left:50%;transform:translateX(-50%);bottom:1.5rem;color:#fff;font-size:0.875rem}
+      @media (max-width:32.5rem){
+        h1{font-size:1.375rem}
+        .logo{height:4.5rem}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="controls">
+        <label for="sort-select">Sort by:</label>
+        <select id="sort-select">
+          <option value="newest">Newest</option>
+          <option value="color">Color</option>
+          <option value="collection">Collection</option>
+        </select>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <div id="modal" class="modal" role="dialog" aria-hidden="true">
+      <div id="modal-content"></div>
+      <button id="modal-prev" class="modal-nav" aria-label="Previous">◀</button>
+      <button id="modal-next" class="modal-nav" aria-label="Next">▶</button>
+    </div>
+    <div id="cap" class="caption" aria-hidden="true"></div>
+
+    <script>
+      // artworkSources will be derived at runtime from folderImages.json
+      // so the site updates automatically when that file is regenerated.
+      let artworkSources = [];
+
+      const grid = document.getElementById('grid');
+      let topRow = document.getElementById('top-row');
+      // keep a persistent reference to the original controls element so we can safely move it
+      const originalControls = document.querySelector('.controls');
+      const modal = document.getElementById('modal');
+      const modalContent = document.getElementById('modal-content');
+      const modalPrev = document.getElementById('modal-prev');
+      const modalNext = document.getElementById('modal-next');
+      // modal state for navigating images within the same artwork folder
+      // modalFiles: array of image src strings to navigate; modalPos: current index
+      let modalFiles = [];
+      let modalPos = 0;
+      // mapping of folder -> array of image paths (populated from folderImages.json)
+      let folderImages = {};
+      // load folderImages.json if present to get all images per folder (useful for modal navigation)
+      // and to derive the list of main thumbnails shown on the grid.
+      fetch('folderImages.json').then(r=>r.json()).then(data=>{
+        for(const k in data){
+          try{
+            folderImages[k] = data[k].map(p=>decodeURIComponent(p));
+          }catch(e){
+            folderImages[k] = data[k];
+          }
+        }
+        // derive one main thumbnail per folder (prefer files containing '_main' or 'main.jpg')
+        const pickMain = (arr)=>{
+          if(!arr || !arr.length) return null;
+          const lower = arr.map(a=>a.toLowerCase());
+          for(let i=0;i<lower.length;i++){
+            if(lower[i].includes('_main') || lower[i].endsWith('/main.jpg') || lower[i].endsWith('main.jpg')) return arr[i];
+          }
+          return arr[0];
+        };
+        const mains = Object.keys(folderImages).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(folderImages[folder])).filter(Boolean);
+        if(mains.length){
+          artworkSources = mains.slice();
+          buildItems();
+          render();
+        }
+      }).catch(()=>{ /* ignore if not present */ });
+
+      function openModalFor(idx){
+        const src = items[idx].src;
+        const folder = src.substring(0, src.lastIndexOf('/')) + '/';
+        // prefer using folderImages.json lists when available
+        if(folderImages[folder] && folderImages[folder].length){
+          modalFiles = folderImages[folder].slice();
+          // ensure exact strings (items may use unencoded paths)
+          modalPos = modalFiles.indexOf(src);
+          if(modalPos === -1){
+            // try matching by decode/encode variants
+            const decodedFiles = modalFiles.map(p=>decodeURIComponent(p));
+            modalPos = decodedFiles.indexOf(src);
+            if(modalPos === -1) modalPos = 0;
+          }
+          showModalAt(modalPos);
+          return;
+        }
+        // fallback: build group from items in same folder
+        const group = items.map((it, i) => ({i, src: it.src})).filter(x => x.src.startsWith(folder)).map(x => x.src);
+        modalFiles = group.length ? group : [src];
+        modalPos = modalFiles.indexOf(src);
+        if(modalPos === -1) modalPos = 0;
+        showModalAt(modalPos);
+      }
+
+      function showModalAt(pos){
+        const src = modalFiles[pos];
+        const item = items.find(it=>it.src === src);
+        modal.classList.add('open');
+        modalContent.innerHTML = '';
+        const large = document.createElement('img');
+        large.src = src;
+        large.alt = item ? item.title : titleFromPath(src);
+        modalContent.appendChild(large);
+        modal.setAttribute('aria-hidden','false');
+        cap.textContent = item ? item.title : titleFromPath(src);
+        cap.style.display = 'block';
+      }
+
+      function modalPrevClick(){
+        if(modalFiles.length <= 1) return;
+        modalPos = (modalPos - 1 + modalFiles.length) % modalFiles.length;
+        showModalAt(modalPos);
+      }
+      function modalNextClick(){
+        if(modalFiles.length <= 1) return;
+        modalPos = (modalPos + 1) % modalFiles.length;
+        showModalAt(modalPos);
+      }
+      const cap = document.getElementById('cap');
+      const sortSelect = document.getElementById('sort-select');
+
+      // build a custom-styled select UI to replace native dropdown visuals (so hover/focus use our accent)
+      function createCustomSelect(){
+        const container = document.querySelector('.controls');
+        if(!container || container.querySelector('.custom-select')) return;
+        const sel = sortSelect;
+        // keep native select in memory but remove it from DOM (we'll drive sorting from JS)
+        sel.style.position = 'absolute'; sel.style.left = '-9999px'; sel.style.top = 'auto';
+
+        const wrapper = document.createElement('div'); wrapper.className = 'custom-select';
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'custom-select-button';
+        button.textContent = sel.options[sel.selectedIndex]?.text || '';
+        const list = document.createElement('div'); list.className = 'custom-select-list'; list.style.display = 'none';
+
+        Array.from(sel.options).forEach(opt=>{
+          const it = document.createElement('div'); it.className = 'custom-select-item'; it.textContent = opt.text; it.dataset.value = opt.value;
+          it.addEventListener('click', ()=>{
+            sel.value = it.dataset.value;
+            button.textContent = it.textContent;
+            list.style.display = 'none';
+            sel.dispatchEvent(new Event('change'));
+          });
+          list.appendChild(it);
+        });
+
+        button.addEventListener('click', (e)=>{ e.stopPropagation(); list.style.display = list.style.display === 'none' ? 'block' : 'none'; });
+        document.addEventListener('click', ()=>{ list.style.display = 'none'; });
+        wrapper.appendChild(button); wrapper.appendChild(list);
+        container.appendChild(wrapper);
+        // remove the original select element from the DOM so only the custom control is visible
+        if(sel.parentNode) sel.parentNode.removeChild(sel);
+      }
+
+      createCustomSelect();
+
+      function titleFromPath(p){
+        const part = p.split('/')[1]||p;
+        return part
+          .replace(/^\d+[-_]?/, '')
+          .replace(/[-_]+/g, ' ')
+          .replace(/\s+e\s+/, ' ')
+          .trim();
+      }
+
+      // Optional manual metadata overrides by image path
+      // Example: {'Art/33-Sommer am See/33_main.jpg': { season: 'Summer', collection: 'Lakes' }}
+      const metadataOverrides = {
+      };
+
+      function inferSeason(title){
+        const t = title.toLowerCase();
+        if(/weihnacht|winter|schnee|schneeg/.test(t)) return 'Winter';
+        if(/frühling|fruehling|fruhling|fruehlings|frühlings/.test(t)) return 'Spring';
+        if(/sommer|sonne/.test(t)) return 'Summer';
+        if(/herbst/.test(t)) return 'Autumn';
+        return 'Unknown';
+      }
+
+      function inferCollection(title, src){
+        const t = title.toLowerCase();
+        if(/weihnacht/.test(t)) return 'Weihnachten';
+        if(/-e-|_e_| e /.test(' ' + src + ' ')) return 'Edition E';
+        if(/-v\b|_v\b/.test(src)) return 'Variant';
+        return 'General';
+      }
+
+      // Convert RGB to HSL hue (0..360) and lightness (0..100)
+      function rgbToHsl(r,g,b){
+        r/=255; g/=255; b/=255;
+        const max = Math.max(r,g,b), min = Math.min(r,g,b);
+        let h, s, l = (max+min)/2;
+        if(max === min){ h = s = 0; }
+        else {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+          }
+          h *= 60;
+        }
+        return {h, s: s*100, l: l*100};
+      }
+
+      function hueToName(h){
+        if (h == null || Number.isNaN(h)) return 'unknown';
+        const names = [
+          'red','orange','yellow','lime','green','teal','cyan','blue','indigo','violet','magenta','crimson'
+        ];
+        const index = Math.round(((h % 360) / 360) * names.length) % names.length;
+        return names[index];
+      }
+
+      function computeImageHue(img){
+        try {
+          const cvs = document.createElement('canvas');
+          const ctx = cvs.getContext('2d');
+          const w = 80, h = 80;
+          cvs.width = w; cvs.height = h;
+          ctx.drawImage(img, 0, 0, w, h);
+          const { data } = ctx.getImageData(0, 0, w, h);
+          let r=0,g=0,b=0,count=0;
+          for(let i=0;i<data.length;i+=4){
+            const rr=data[i], gg=data[i+1], bb=data[i+2], aa=data[i+3];
+            if(aa<128) continue;
+            r+=rr; g+=gg; b+=bb; count++;
+          }
+          if(count===0) return {h:null,l:null,name:'unknown'};
+          r/=count; g/=count; b/=count;
+          const hsl = rgbToHsl(r,g,b);
+          return {h:hsl.h, l:hsl.l, name:hueToName(hsl.h)};
+        } catch(e){
+          return {h:null,l:null,name:'unknown'};
+        }
+        }
+
+        // build persistent bottom-row with contact tiles
+        let bottomRow = document.getElementById('bottom-row');
+        if(!bottomRow){
+          bottomRow = document.createElement('div');
+          bottomRow.id = 'bottom-row';
+          bottomRow.className = 'bottom-row';
+          grid.after(bottomRow);
+        }
+        bottomRow.innerHTML = '';
+
+        // Contact info tile
+        const contactInfo = document.createElement('div');
+        contactInfo.className = 'cell-like';
+        const ci = document.createElement('div');
+        ci.style.textAlign = 'center';
+        ci.innerHTML = '<strong>Feel free to reach out!</strong>';
+        contactInfo.appendChild(ci);
+        bottomRow.appendChild(contactInfo);
+
+        // Contact form tile
+        const cf = document.createElement('div');
+        cf.className = 'cell-like contact-form';
+        const form = document.createElement('form');
+        form.innerHTML = '<input name="name" placeholder="Your name"><input name="email" placeholder="Your email"><textarea name="message" placeholder="Message" rows="4"></textarea><div><button type="submit">Send</button></div>';
+        // enhance contact form: require fields, validate email, and show confirmation after opening mail client
+        const errorSpan = document.createElement('div'); errorSpan.style.color = '#b33'; errorSpan.style.fontSize = '0.9rem'; errorSpan.style.marginBottom = '0.5rem';
+        form.prepend(errorSpan);
+        form.addEventListener('submit', (e)=>{
+          e.preventDefault();
+          errorSpan.textContent = '';
+          const fd = new FormData(form);
+          const name = (fd.get('name') || '').trim();
+          const email = (fd.get('email') || '').trim();
+          const message = (fd.get('message') || '').trim();
+          if(!name || !email || !message){ errorSpan.textContent = 'Please fill all fields.'; return; }
+          const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+          if(!emailOk){ errorSpan.textContent = 'Please provide a valid email address.'; return; }
+          const subject = encodeURIComponent('Website contact from ' + name);
+          const body = encodeURIComponent('From: ' + name + ' <' + email + '>\r\n\r\n' + message);
+          window.location.href = 'mailto:contact@cosaha.example?subject=' + subject + '&body=' + body;
+          // show a gentle confirmation in the tile
+          form.innerHTML = '<div style="font-weight:600">Thank you — your mail client should open.</div>';
+        });
+        cf.appendChild(form);
+        bottomRow.appendChild(cf);
+
+        // Impressum tile — opens modal with official Impressum text
+        const imp = document.createElement('div');
+        imp.className = 'cell-like';
+        imp.style.textAlign = 'center';
+        imp.innerHTML = '<strong>Impressum</strong>';
+        imp.addEventListener('click', ()=>{
+          modal.classList.add('open');
+          modalContent.innerHTML = '';
+          const wrapper = document.createElement('div');
+          wrapper.style.maxWidth = '92vw';
+          wrapper.style.maxHeight = '88vh';
+          wrapper.style.overflow = 'auto';
+          wrapper.style.background = '#fff';
+          wrapper.style.padding = '1rem';
+          wrapper.innerHTML = `
+            <h2>Impressum</h2>
+            <p>Angaben gemäß § 5 DDG:</p>
+            <p>
+              Vorname Nachname<br>
+              Straße Hausnummer<br>
+              PLZ Ort<br>
+              Deutschland
+            </p>
+            <p>
+              <strong>Kontakt:</strong><br>
+              Telefon: 0XXX / XXXXXXX<br>
+              E‑Mail: kontakt@deine-domain.de
+            </p>
+            <p>Berufsbezeichnung: freiberufliche Künstlerin</p>
+          `;
+          modalContent.appendChild(wrapper);
+          modal.setAttribute('aria-hidden','false');
+          cap.textContent = 'Impressum';
+          cap.style.display = 'block';
+        });
+        bottomRow.appendChild(imp);
+
+        // Copyright tile
+        const copy = document.createElement('div');
+        copy.className = 'cell-like';
+        copy.style.textAlign = 'center';
+        copy.innerHTML = '&copy; ' + new Date().getFullYear() + ' Cosaha';
+        bottomRow.appendChild(copy);
+
+      let items = [];
+
+      function buildItems(){
+        items = artworkSources.map((src, idx) => {
+          const title = titleFromPath(src);
+          const override = metadataOverrides[src] || {};
+          const season = override.season || inferSeason(title);
+          const collection = override.collection || inferCollection(title, src);
+          return {
+            idx,
+            src,
+            title,
+            season,
+            collection,
+            hue: null,
+            lightness: null,
+            colorName: 'unknown'
+          };
+        });
+      }
+
+      // build initial items from fallback list; this will be replaced if folderImages.json is present
+      buildItems();
+
+      function cellFor(item){
+        const a = document.createElement('a');
+        a.href = 'javascript:void(0)';
+        a.className = 'cell';
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.title;
+        img.loading = 'lazy';
+        img.addEventListener('load', () => {
+          if(item.hue == null){
+            const c = computeImageHue(img);
+            item.hue = c.h; item.lightness = c.l; item.colorName = c.name;
+            // update the meta text if the title/meta cell exists
+            if(item._metaDiv){
+              const parts = [];
+              if(item.colorName) parts.push(item.colorName);
+              if(item.collection) parts.push(item.collection);
+              item._metaDiv.textContent = parts.join(' · ');
+            }
+            if (sortSelect.value === 'color') debouncedRender();
+          }
+        }, { once: true });
+        a.appendChild(img);
+        a.addEventListener('click', ()=>{
+          openModalFor(item.idx);
+        });
+        return a;
+      }
+
+      const introTitle = 'Bring color into your home.';
+      const introText = 'I love experimenting with colors, shapes, textures, and materials. For my monoprints I use natural materials like leaves and grasses as well as everyday objects. Each work is unique and fits the square frame of the Gelli Plate.';
+
+      function render(){
+        const mode = sortSelect.value;
+        const list = items.slice();
+        const seasonOrder = { 'Winter':0, 'Spring':1, 'Summer':2, 'Autumn':3, 'Unknown':4 };
+        list.sort((a,b)=>{
+          switch(mode){
+            case 'newest':
+              return b.idx - a.idx;
+            case 'title':
+              return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
+            case 'color': {
+              const ah = a.hue ?? 9999; const bh = b.hue ?? 9999;
+              if (ah !== bh) return ah - bh;
+              const al = a.lightness ?? 9999; const bl = b.lightness ?? 9999;
+              return al - bl;
+            }
+            case 'season':
+              return (seasonOrder[a.season] ?? 99) - (seasonOrder[b.season] ?? 99)
+                || a.title.localeCompare(b.title);
+            case 'collection':
+              return a.collection.localeCompare(b.collection, undefined, {sensitivity:'base'})
+                || a.title.localeCompare(b.title);
+            default:
+              return a.idx - b.idx; // original order
+          }
+        });
+        // ensure topRow exists
+        if(!topRow){
+          topRow = document.createElement('div');
+          topRow.id = 'top-row';
+          topRow.className = 'top-row';
+          grid.before(topRow);
+        }
+        // clear and rebuild topRow each render; we'll re-append the stored controls node
+        topRow.innerHTML = '';
+
+        // insert logo as a single top-row cell
+        const logoWrap = document.createElement('div');
+        logoWrap.className = 'logo-item';
+        const logoImg = document.createElement('img');
+        logoImg.src = 'Icon.svg';
+        logoImg.alt = 'Cosaha';
+        logoImg.className = 'logo-icon';
+        logoWrap.appendChild(logoImg);
+        topRow.appendChild(logoWrap);
+
+        // insert headline as its own top-row cell
+        const headWrap = document.createElement('div');
+        headWrap.className = 'headline-item';
+        const h = document.createElement('h1'); h.textContent = introTitle;
+        headWrap.appendChild(h);
+        topRow.appendChild(headWrap);
+
+        // insert single philosophy cell (one top-row tile)
+        const phWrap = document.createElement('div');
+        phWrap.className = 'philosophy-item';
+        const php = document.createElement('p'); php.className = 'phi';
+        // split into sentences and insert blank lines (double <br>) between sentences
+        const sentences = introText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [introText];
+        sentences.forEach((s, i) => {
+          const t = s.trim();
+          if (!t) return;
+          php.appendChild(document.createTextNode(t));
+          if (i < sentences.length - 1) {
+            php.appendChild(document.createElement('br'));
+            php.appendChild(document.createElement('br'));
+          }
+        });
+        phWrap.appendChild(php);
+        topRow.appendChild(phWrap);
+
+        // insert controls as a top-row tile by moving the original controls element into it (placed last in the first row)
+        if(originalControls){
+          const controlsTile = document.createElement('div');
+          controlsTile.className = 'controls-item';
+          controlsTile.appendChild(originalControls);
+          topRow.appendChild(controlsTile);
+        }
+
+        // clear grid artworks area
+        grid.innerHTML = '';
+
+        // render rows with two artworks and their text tiles per row
+        const pairs = list.slice();
+        // determine current number of columns from computed style
+        const computedCols = window.getComputedStyle(grid).gridTemplateColumns.split(' ').length || 4;
+        // prefer two artworks per row; fall back to 1 if columns are too small
+        let pairsPerRow = 2;
+        if (computedCols < 2) pairsPerRow = 1;
+        const preCount = grid.children.length;
+        let idx = 0;
+        let rowIndex = Math.floor(preCount / computedCols);
+        while (idx < pairs.length) {
+          const rowSlice = pairs.slice(idx, idx + pairsPerRow);
+          // start rows with the text cell (offset parity so text appears first)
+          const artworkFirst = (rowIndex % 2 !== 0);
+          for (const art of rowSlice) {
+            const artCell = cellFor(art);
+            const titleCell = document.createElement('div');
+            titleCell.className = 'text-item';
+            const titleDiv = document.createElement('div'); titleDiv.className = 'title'; titleDiv.textContent = art.title;
+            const metaDiv = document.createElement('div'); metaDiv.className = 'meta';
+            const metaParts = [];
+            if (art.colorName) metaParts.push(art.colorName);
+            if (art.collection) metaParts.push(art.collection);
+            metaDiv.textContent = metaParts.join(' · ');
+            const tp = document.createElement('div'); tp.className = 'phi'; tp.appendChild(titleDiv); tp.appendChild(metaDiv);
+            titleCell.appendChild(tp);
+            art._metaDiv = metaDiv;
+
+            if (artworkFirst) {
+              grid.appendChild(artCell);
+              titleCell.classList.add('side-right');
+              grid.appendChild(titleCell);
+            } else {
+              titleCell.classList.add('side-left');
+              grid.appendChild(titleCell);
+              grid.appendChild(artCell);
+            }
+          }
+          idx += pairsPerRow;
+          rowIndex += 1;
+        }
+      }
+
+      let renderTimer = null;
+      function debouncedRender(){
+        if(renderTimer) cancelAnimationFrame(renderTimer);
+        renderTimer = requestAnimationFrame(render);
+      }
+
+      sortSelect.addEventListener('change', render);
+
+      // Initial render
+      render();
+
+      // After initial build, attempt to fetch folderImages.json again and derive main thumbnails
+      // This run happens after buildItems exists so we can replace artworkSources and rebuild items
+      fetch('folderImages.json').then(r=>r.json()).then(data=>{
+        try{
+          const fmap = {};
+          for(const k in data) fmap[k] = data[k].map(p=>decodeURIComponent(p));
+          const pickMain = (arr)=>{
+            if(!arr || !arr.length) return null;
+            const lower = arr.map(a=>a.toLowerCase());
+            for(let i=0;i<lower.length;i++){
+              if(lower[i].includes('_main') || lower[i].endsWith('/main.jpg') || lower[i].endsWith('main.jpg')) return arr[i];
+            }
+            return arr[0];
+          };
+          const mains = Object.keys(fmap).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(fmap[folder])).filter(Boolean);
+          if(mains.length){
+            artworkSources = mains.slice();
+            buildItems();
+            render();
+          }
+        }catch(e){ /* ignore errors */ }
+      }).catch(()=>{});
+
+      modal.addEventListener('click', (e)=>{
+        // close only when clicking the backdrop, not when clicking modal content or nav buttons
+        if(e.target === modal){
+          modal.classList.remove('open');
+          modal.setAttribute('aria-hidden','true');
+          modalContent.innerHTML = '';
+          cap.style.display = 'none';
+        }
+      });
+      modalPrev.addEventListener('click', (e)=>{ e.stopPropagation(); modalPrevClick(); });
+      modalNext.addEventListener('click', (e)=>{ e.stopPropagation(); modalNextClick(); });
+      document.addEventListener('keydown', (e)=>{
+        if(e.key==='Escape'){
+          modal.classList.remove('open');
+        } else if(e.key==='ArrowLeft'){
+          if(modal.classList.contains('open')) modalPrevClick();
+        } else if(e.key==='ArrowRight'){
+          if(modal.classList.contains('open')) modalNextClick();
+        }
+      });
+
+      document.addEventListener('keydown', (e)=>{
+        if(e.key==='Escape') modal.classList.remove('open');
+      });
+    </script>
+  </body>
+</html>
