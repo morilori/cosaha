@@ -30,10 +30,14 @@ jobs:
         run: |
           python3 scripts/update_artworks.py
 
+      - name: Prepare Pages build (copy safe assets)
+        run: |
+          python3 scripts/prepare_pages.py
+
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
         with:
-          path: .
+          path: pages_build
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
