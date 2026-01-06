@@ -4,14 +4,14 @@ on:
   push:
     branches: [ main ]
 
-      permissions:
-        contents: write
-        pages: write
-        id-token: write
-      contents: read
-      pages: write
-      id-token: write
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,8 +41,6 @@ on:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git --version
-          git status --porcelain || true
 
       - name: Deploy to gh-pages branch
         uses: JamesIves/github-pages-deploy-action@v4
