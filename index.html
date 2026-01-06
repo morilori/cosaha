@@ -224,7 +224,8 @@
         modal.classList.add('open');
         modalContent.innerHTML = '';
         const large = document.createElement('img');
-        large.src = src;
+        const largeSrc = (src && src.normalize) ? src.normalize('NFC') : src;
+        large.src = encodeURI(largeSrc);
         large.alt = item ? item.title : titleFromPath(src);
         modalContent.appendChild(large);
         modal.setAttribute('aria-hidden','false');
@@ -481,7 +482,8 @@
         a.href = 'javascript:void(0)';
         a.className = 'cell';
         const img = document.createElement('img');
-        img.src = item.src;
+        const imgSrc = (item.src && item.src.normalize) ? item.src.normalize('NFC') : item.src;
+        img.src = encodeURI(imgSrc);
         img.alt = item.title;
         img.loading = 'lazy';
         img.addEventListener('load', () => {
