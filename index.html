@@ -166,18 +166,22 @@
       fetch('folderImages.json').then(r=>r.json()).then(data=>{
         for(const k in data){
           try{
-            folderImages[k] = data[k].map(p=>decodeURIComponent(p));
+            // decode and normalize to NFC so URL bytes match deployed filenames
+            folderImages[k] = data[k].map(p=>decodeURIComponent(p).normalize('NFC'));
           }catch(e){
-            folderImages[k] = data[k];
+            folderImages[k] = data[k].map(p=> (p && p.normalize) ? p.normalize('NFC') : p);
           }
         }
-        // by default include all image files from every folder (not only a single "main")
-        const isImage = (p) => /\.(jpe?g|png|gif)$/i.test(p);
-        const mains = [];
-        Object.keys(folderImages).sort((a,b)=>a.localeCompare(b)).forEach(folder=>{
-          const files = (folderImages[folder]||[]).filter(isImage);
-          files.forEach(f=> mains.push(f));
-        });
+        // derive one main thumbnail per folder (prefer files containing '_main' or 'main.jpg')
+        const pickMain = (arr)=>{
+          if(!arr || !arr.length) return null;
+          const lower = arr.map(a=>a.toLowerCase());
+          for(let i=0;i<lower.length;i++){
+            if(lower[i].includes('_main') || lower[i].endsWith('/main.jpg') || lower[i].endsWith('main.jpg')) return arr[i];
+          }
+          return arr[0];
+        };
+        const mains = Object.keys(folderImages).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(folderImages[folder])).filter(Boolean);
         if(mains.length){
           artworkSources = mains.slice();
           buildItems();
@@ -191,21 +195,25 @@
         // prefer using folderImages.json lists when available
         if(folderImages[folder] && folderImages[folder].length){
           modalFiles = folderImages[folder].slice();
+          // ensure normalized strings for reliable comparisons with deployed paths
+          modalFiles = modalFiles.map(s => (s && s.normalize) ? s.normalize('NFC') : s);
           // ensure exact strings (items may use unencoded paths)
-          modalPos = modalFiles.indexOf(src);
+          const normSrc = (src && src.normalize) ? src.normalize('NFC') : src;
+          modalPos = modalFiles.indexOf(normSrc);
           if(modalPos === -1){
             // try matching by decode/encode variants
-            const decodedFiles = modalFiles.map(p=>decodeURIComponent(p));
-            modalPos = decodedFiles.indexOf(src);
+            const decodedFiles = modalFiles.map(p=>{ try { return decodeURIComponent(p).normalize('NFC'); } catch(e){ return p; } });
+            modalPos = decodedFiles.indexOf(normSrc);
             if(modalPos === -1) modalPos = 0;
           }
           showModalAt(modalPos);
           return;
         }
         // fallback: build group from items in same folder
-        const group = items.map((it, i) => ({i, src: it.src})).filter(x => x.src.startsWith(folder)).map(x => x.src);
-        modalFiles = group.length ? group : [src];
-        modalPos = modalFiles.indexOf(src);
+        const group = items.map((it, i) => ({i, src: it.src})).filter(x => x.src && x.src.startsWith(folder)).map(x => (x.src && x.src.normalize) ? x.src.normalize('NFC') : x.src);
+        modalFiles = group.length ? group : [ (src && src.normalize) ? src.normalize('NFC') : src ];
+        const normSrc2 = (src && src.normalize) ? src.normalize('NFC') : src;
+        modalPos = modalFiles.indexOf(normSrc2);
         if(modalPos === -1) modalPos = 0;
         showModalAt(modalPos);
       }
@@ -447,13 +455,14 @@
 
       function buildItems(){
         items = artworkSources.map((src, idx) => {
-          const title = titleFromPath(src);
-          const override = metadataOverrides[src] || {};
+          const s = (src && src.normalize) ? src.normalize('NFC') : src;
+          const title = titleFromPath(s);
+          const override = metadataOverrides[s] || {};
           const season = override.season || inferSeason(title);
-          const collection = override.collection || inferCollection(title, src);
+          const collection = override.collection || inferCollection(title, s);
           return {
             idx,
-            src,
+            src: s,
             title,
             season,
             collection,
@@ -640,13 +649,16 @@
       fetch('folderImages.json').then(r=>r.json()).then(data=>{
         try{
           const fmap = {};
-          for(const k in data) fmap[k] = data[k].map(p=>decodeURIComponent(p));
-          const isImage = (p) => /\.(jpe?g|png|gif)$/i.test(p);
-          const mains = [];
-          Object.keys(fmap).sort((a,b)=>a.localeCompare(b)).forEach(folder=>{
-            const files = (fmap[folder]||[]).filter(isImage);
-            files.forEach(f=> mains.push(f));
-          });
+          for(const k in data) fmap[k] = data[k].map(p=>decodeURIComponent(p).normalize('NFC'));
+          const pickMain = (arr)=>{
+            if(!arr || !arr.length) return null;
+            const lower = arr.map(a=>a.toLowerCase());
+            for(let i=0;i<lower.length;i++){
+              if(lower[i].includes('_main') || lower[i].endsWith('/main.jpg') || lower[i].endsWith('main.jpg')) return arr[i];
+            }
+            return arr[0];
+          };
+          const mains = Object.keys(fmap).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(fmap[folder])).filter(Boolean);
           if(mains.length){
             artworkSources = mains.slice();
             buildItems();
