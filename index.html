@@ -171,16 +171,13 @@
             folderImages[k] = data[k];
           }
         }
-        // derive one main thumbnail per folder (prefer files containing '_main' or 'main.jpg')
-        const pickMain = (arr)=>{
-          if(!arr || !arr.length) return null;
-          const lower = arr.map(a=>a.toLowerCase());
-          for(let i=0;i<lower.length;i++){
-            if(lower[i].includes('_main') || lower[i].endsWith('/main.jpg') || lower[i].endsWith('main.jpg')) return arr[i];
-          }
-          return arr[0];
-        };
-        const mains = Object.keys(folderImages).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(folderImages[folder])).filter(Boolean);
+        // by default include all image files from every folder (not only a single "main")
+        const isImage = (p) => /\.(jpe?g|png|gif)$/i.test(p);
+        const mains = [];
+        Object.keys(folderImages).sort((a,b)=>a.localeCompare(b)).forEach(folder=>{
+          const files = (folderImages[folder]||[]).filter(isImage);
+          files.forEach(f=> mains.push(f));
+        });
         if(mains.length){
           artworkSources = mains.slice();
           buildItems();
@@ -644,15 +641,12 @@
         try{
           const fmap = {};
           for(const k in data) fmap[k] = data[k].map(p=>decodeURIComponent(p));
-          const pickMain = (arr)=>{
-            if(!arr || !arr.length) return null;
-            const lower = arr.map(a=>a.toLowerCase());
-            for(let i=0;i<lower.length;i++){
-              if(lower[i].includes('_main') || lower[i].endsWith('/main.jpg') || lower[i].endsWith('main.jpg')) return arr[i];
-            }
-            return arr[0];
-          };
-          const mains = Object.keys(fmap).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(fmap[folder])).filter(Boolean);
+          const isImage = (p) => /\.(jpe?g|png|gif)$/i.test(p);
+          const mains = [];
+          Object.keys(fmap).sort((a,b)=>a.localeCompare(b)).forEach(folder=>{
+            const files = (fmap[folder]||[]).filter(isImage);
+            files.forEach(f=> mains.push(f));
+          });
           if(mains.length){
             artworkSources = mains.slice();
             buildItems();
