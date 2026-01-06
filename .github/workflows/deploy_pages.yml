@@ -34,10 +34,10 @@ jobs:
         run: |
           if [ -f CNAME ]; then rm -f CNAME; echo "Removed CNAME for this deployment"; else echo "No CNAME present"; fi
 
-      - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v1
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          path: .
-
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v1
+          branch: gh-pages
+          folder: .
+          clean: true
+          token: ${{ secrets.GITHUB_TOKEN }}
