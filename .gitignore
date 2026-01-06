@@ -9,7 +9,6 @@ __pycache__/
 build/
 dist/
 *.egg-info/
-folderImages.json
 .DS_Store
 .idea/
 .vscode/
