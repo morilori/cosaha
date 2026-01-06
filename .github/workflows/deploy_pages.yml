@@ -30,14 +30,14 @@ jobs:
         run: |
           python3 scripts/update_artworks.py
 
-      - name: Prepare Pages build (copy safe assets)
+      - name: Remove CNAME (deploy without custom domain)
         run: |
-          python3 scripts/prepare_pages.py
+          if [ -f CNAME ]; then rm -f CNAME; echo "Removed CNAME for this deployment"; else echo "No CNAME present"; fi
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
         with:
-          path: pages_build
+          path: .
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
