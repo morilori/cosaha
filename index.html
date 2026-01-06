@@ -393,7 +393,7 @@
         const cf = document.createElement('div');
         cf.className = 'cell-like contact-form';
         const form = document.createElement('form');
-        form.innerHTML = '<input name="name" placeholder="Your name"><input name="email" placeholder="Your email"><textarea name="message" placeholder="Message" rows="4"></textarea><div><button type="submit">Send</button></div>';
+        form.innerHTML = '<label for="contact-name">Name</label><input id="contact-name" name="name" placeholder="Your name" autocomplete="name" required><label for="contact-email">Email</label><input id="contact-email" name="email" placeholder="Your email" type="email" autocomplete="email" required><label for="contact-message">Message</label><textarea id="contact-message" name="message" placeholder="Message" rows="4" autocomplete="off" required></textarea><div><button type="submit">Send</button></div>';
         // enhance contact form: require fields, validate email, and show confirmation after opening mail client
         const errorSpan = document.createElement('div'); errorSpan.style.color = '#b33'; errorSpan.style.fontSize = '0.9rem'; errorSpan.style.marginBottom = '0.5rem';
         form.prepend(errorSpan);
