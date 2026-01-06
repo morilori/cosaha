@@ -49,6 +49,6 @@ jobs:
           folder: .
           clean: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit_message: "Deploy site via GitHub Actions"
-          author_name: "github-actions[bot]"
-          author_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          commit-message: "Deploy site via GitHub Actions"
+          git-config-name: "github-actions[bot]"
+          git-config-email: "41898282+github-actions[bot]@users.noreply.github.com"
