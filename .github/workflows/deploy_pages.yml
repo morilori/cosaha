@@ -18,11 +18,17 @@ jobs:
         with:
           persist-credentials: true
           fetch-depth: 0
+          lfs: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
+
+      - name: Ensure Git LFS
+        run: |
+          git lfs install --local
+          git lfs pull
 
       - name: Install requirements
         run: |
