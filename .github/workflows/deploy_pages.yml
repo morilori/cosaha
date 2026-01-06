@@ -38,11 +38,6 @@ jobs:
       - name: Regenerate folderImages.json
         run: |
           python3 scripts/update_artworks.py
-
-      - name: Remove CNAME (deploy without custom domain)
-        run: |
-          if [ -f CNAME ]; then rm -f CNAME; echo "Removed CNAME for this deployment"; else echo "No CNAME present"; fi
-
       - name: Configure git for deploy
         run: |
           git config --global user.name "github-actions[bot]"
