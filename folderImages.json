@@ -1,8 +1,4 @@
 {
-  "Art/": [
-    "Art/frame_back.jpg",
-    "Art/frame_side.jpg"
-  ],
   "Art/20-Farbenfrohes Blättermeer/": [
     "Art/20-Farbenfrohes%20Bla%CC%88ttermeer/20251109_113758.jpg",
     "Art/20-Farbenfrohes%20Bla%CC%88ttermeer/20251109_115533.jpg",
@@ -188,6 +184,10 @@
     "Art/25_goldener%20Weihnachtsduft/20251119_154827.jpg",
     "Art/25_goldener%20Weihnachtsduft/20251119_155546.jpg",
     "Art/25_goldener%20Weihnachtsduft/25_main.jpg"
+  ],
+  "Art/Frame/": [
+    "Art/Frame/frame_back.jpg",
+    "Art/Frame/frame_side.jpg"
   ],
   "Art/82-Gedankenkreisel/": [
     "Art/82-Gedankenkreisel/82_20260705_152235_Gedankenkreisel.jpg"

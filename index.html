@@ -528,6 +528,22 @@
 
       let items = [];
 
+      // photos are named with an embedded capture timestamp (YYYYMMDD_HHMMSS,
+      // e.g. "37_20260220_103421_Rosenblätter.jpg"); use the earliest one found
+      // among an artwork's files as its creation date for "Newest" sorting.
+      function extractDateKey(paths){
+        const re = /(\d{8})_(\d{6})/;
+        let best = null;
+        for(const p of (paths || [])){
+          const m = re.exec(p);
+          if(m){
+            const key = m[1] + m[2];
+            if(best === null || key < best) best = key;
+          }
+        }
+        return best;
+      }
+
       function buildItems(){
         items = artworkSources.map((src, idx) => {
           const s = (src && src.normalize) ? src.normalize('NFC') : src;
@@ -535,6 +551,8 @@
           const override = metadataOverrides[s] || {};
           const season = override.season || inferSeason(title);
           const collection = override.collection || inferCollection(title, s);
+          const folder = s.substring(0, s.lastIndexOf('/')) + '/';
+          const dateKey = extractDateKey(folderImages[folder] || [s]);
           return {
             idx,
             src: s,
@@ -543,7 +561,8 @@
             collection,
             hue: null,
             lightness: null,
-            colorName: 'unknown'
+            colorName: 'unknown',
+            dateKey
           };
         });
       }
@@ -590,8 +609,12 @@
         const seasonOrder = { 'Winter':0, 'Spring':1, 'Summer':2, 'Autumn':3, 'Unknown':4 };
         list.sort((a,b)=>{
           switch(mode){
-            case 'newest':
+            case 'newest': {
+              const ak = a.dateKey || '';
+              const bk = b.dateKey || '';
+              if(ak !== bk) return ak < bk ? 1 : -1;
               return b.idx - a.idx;
+            }
             case 'title':
               return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
             case 'color': {
