@@ -165,11 +165,13 @@
       // and to derive the list of main thumbnails shown on the grid.
       fetch('folderImages.json').then(r=>r.json()).then(data=>{
         for(const k in data){
+          // normalize the folder key too, so lookups by NFC-normalized item.src succeed
+          const nk = (k && k.normalize) ? k.normalize('NFC') : k;
           try{
             // decode and normalize to NFC so URL bytes match deployed filenames
-            folderImages[k] = data[k].map(p=>decodeURIComponent(p).normalize('NFC'));
+            folderImages[nk] = data[k].map(p=>decodeURIComponent(p).normalize('NFC'));
           }catch(e){
-            folderImages[k] = data[k].map(p=> (p && p.normalize) ? p.normalize('NFC') : p);
+            folderImages[nk] = data[k].map(p=> (p && p.normalize) ? p.normalize('NFC') : p);
           }
         }
         // derive one main thumbnail per folder (prefer files containing '_main' or 'main.jpg')
@@ -401,7 +403,7 @@
           if(!emailOk){ errorSpan.textContent = 'Please provide a valid email address.'; return; }
           const subject = encodeURIComponent('Website contact from ' + name);
           const body = encodeURIComponent('From: ' + name + ' <' + email + '>\r\n\r\n' + message);
-          window.location.href = 'mailto:contact@cosaha.example?subject=' + subject + '&body=' + body;
+          window.location.href = 'mailto:info@cosaha.com?subject=' + subject + '&body=' + body;
           // show a gentle confirmation in the tile
           form.innerHTML = '<div style="font-weight:600">Thank you — your mail client should open.</div>';
         });
@@ -426,17 +428,89 @@
             <h2>Impressum</h2>
             <p>Angaben gemäß § 5 DDG:</p>
             <p>
-              Vorname Nachname<br>
-              Straße Hausnummer<br>
-              PLZ Ort<br>
+              Cordula Saupe-Hartstang<br>
+              Schneeballweg 6<br>
+              71139 Ehningen<br>
               Deutschland
             </p>
             <p>
               <strong>Kontakt:</strong><br>
-              Telefon: 0XXX / XXXXXXX<br>
-              E‑Mail: kontakt@deine-domain.de
+              E‑Mail: info@cosaha.com
             </p>
-            <p>Berufsbezeichnung: freiberufliche Künstlerin</p>
+            <p>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:<br>Cordula Saupe-Hartstang</p>
+            <p><strong>Hinweis gemäß § 36 VSBG</strong><br>Ich bin nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+
+            <h2>Datenschutzerklärung</h2>
+
+            <h3>1. Verantwortlicher</h3>
+            <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist:<br>
+              Cordula Saupe-Hartstang<br>
+              Schneeballweg 6<br>
+              71139 Ehningen<br>
+              Deutschland<br>
+              E-Mail: info@cosaha.com
+            </p>
+
+            <h3>2. Hosting</h3>
+            <p>Diese Website wird bei der IONOS SE gehostet.</p>
+            <p>Anbieter:<br>
+              IONOS SE<br>
+              Elgendorfer Straße 57<br>
+              56410 Montabaur<br>
+              Deutschland
+            </p>
+            <p>Beim Besuch dieser Website werden automatisch sogenannte Server-Logfiles verarbeitet. Dazu können insbesondere folgende Daten gehören:</p>
+            <ul>
+              <li>IP-Adresse</li>
+              <li>Datum und Uhrzeit des Zugriffs</li>
+              <li>Browsertyp und Browserversion</li>
+              <li>Betriebssystem</li>
+              <li>Referrer-URL</li>
+              <li>aufgerufene Seiten</li>
+              <li>HTTP-Statuscode</li>
+            </ul>
+            <p>Diese Daten werden verarbeitet, um den sicheren und störungsfreien Betrieb der Website zu gewährleisten.<br>
+            Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.</p>
+
+            <h3>3. Kontaktformular</h3>
+            <p>Wenn du das Kontaktformular nutzt, werden die von dir eingegebenen Daten verarbeitet. Dies sind insbesondere:</p>
+            <ul>
+              <li>Name</li>
+              <li>E-Mail-Adresse</li>
+              <li>Nachricht</li>
+            </ul>
+            <p>Die Verarbeitung erfolgt ausschließlich zur Bearbeitung deiner Anfrage.<br>
+            Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen) bzw. Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bearbeitung von Anfragen).<br>
+            Die Daten werden nur so lange gespeichert, wie dies zur Bearbeitung deiner Anfrage erforderlich ist oder gesetzliche Aufbewahrungspflichten bestehen.</p>
+
+            <h3>4. Cookies</h3>
+            <p>Diese Website verwendet technisch notwendige Cookies, soweit dies für den Betrieb der Website erforderlich ist.<br>
+            Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.<br>
+            Sofern künftig weitere Cookies (z. B. Analyse- oder Marketing-Cookies) eingesetzt werden, erfolgt deren Nutzung ausschließlich nach deiner Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO.</p>
+
+            <h3>5. Weitergabe personenbezogener Daten</h3>
+            <p>Eine Weitergabe deiner personenbezogenen Daten erfolgt nur, wenn dies gesetzlich erlaubt ist oder du ausdrücklich eingewilligt hast.</p>
+
+            <h3>6. Speicherdauer</h3>
+            <p>Personenbezogene Daten werden gelöscht, sobald der Zweck der Verarbeitung entfällt und keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</p>
+
+            <h3>7. Betroffenenrechte</h3>
+            <p>Du hast nach der DSGVO folgende Rechte:</p>
+            <ul>
+              <li>Auskunft (Art. 15 DSGVO)</li>
+              <li>Berichtigung (Art. 16 DSGVO)</li>
+              <li>Löschung (Art. 17 DSGVO)</li>
+              <li>Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
+              <li>Datenübertragbarkeit (Art. 20 DSGVO)</li>
+              <li>Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)</li>
+            </ul>
+            <p>Außerdem hast du das Recht, dich bei einer Datenschutzaufsichtsbehörde zu beschweren.</p>
+
+            <h3>8. SSL-/TLS-Verschlüsselung</h3>
+            <p>Diese Website nutzt aus Sicherheitsgründen eine SSL-/TLS-Verschlüsselung, um übermittelte Daten zu schützen.</p>
+
+            <h3>9. Änderungen dieser Datenschutzerklärung</h3>
+            <p>Wir behalten uns vor, diese Datenschutzerklärung anzupassen, wenn dies aufgrund geänderter gesetzlicher Vorgaben oder technischer Änderungen erforderlich wird.</p>
           `;
           modalContent.appendChild(wrapper);
           modal.setAttribute('aria-hidden','false');
@@ -645,29 +719,6 @@
 
       // Initial render
       render();
-
-      // After initial build, attempt to fetch folderImages.json again and derive main thumbnails
-      // This run happens after buildItems exists so we can replace artworkSources and rebuild items
-      fetch('folderImages.json').then(r=>r.json()).then(data=>{
-        try{
-          const fmap = {};
-          for(const k in data) fmap[k] = data[k].map(p=>decodeURIComponent(p).normalize('NFC'));
-          const pickMain = (arr)=>{
-            if(!arr || !arr.length) return null;
-            const lower = arr.map(a=>a.toLowerCase());
-            for(let i=0;i<lower.length;i++){
-              if(lower[i].includes('_main') || lower[i].endsWith('/main.jpg') || lower[i].endsWith('main.jpg')) return arr[i];
-            }
-            return arr[0];
-          };
-          const mains = Object.keys(fmap).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(fmap[folder])).filter(Boolean);
-          if(mains.length){
-            artworkSources = mains.slice();
-            buildItems();
-            render();
-          }
-        }catch(e){ /* ignore errors */ }
-      }).catch(()=>{});
 
       modal.addEventListener('click', (e)=>{
         // close only when clicking the backdrop, not when clicking modal content or nav buttons
