@@ -9,6 +9,14 @@ Run manually whenever new art is added (after scripts/update_artworks.py):
 
 Safe to re-run: already-processed files are detected via a JPEG EXIF
 marker and skipped, so it won't stack a second copyright line.
+
+IMPORTANT — run this BEFORE scripts/add_copyright_metadata.py, not after.
+This script recompresses the image (Pillow re-encode) and only carries
+forward a fresh EXIF dict with its own marker tag; any other EXIF fields
+present when it runs (Artist/Copyright from the metadata script, camera
+info, etc.) are dropped. Running the metadata script second (it uses
+piexif, which edits only the EXIF segment and preserves everything else)
+restores those tags without touching the now-watermarked pixels.
 """
 import os
 from pathlib import Path

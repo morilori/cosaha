@@ -9,7 +9,10 @@ Doesn't stop anyone from copying a screenshot or a re-saved image (both
 strip EXIF), but gives a real, standard paper trail if the original file
 itself gets reposted.
 
-Run manually whenever new art is added:
+Run manually whenever new art is added — and run it AFTER
+scripts/add_copyright_overlay.py, not before: that script recompresses
+the image with a fresh EXIF dict and would wipe the tags this script sets.
+  python3 scripts/add_copyright_overlay.py
   python3 scripts/add_copyright_metadata.py
 """
 import os
