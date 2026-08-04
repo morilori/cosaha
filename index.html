@@ -91,21 +91,15 @@
       .controls-item .controls{width:100%;display:flex;align-items:center;justify-content:flex-start;padding-left:0.5rem}
       /* bottom-row cells share the same look as other tiles */
       .bottom-row .cell-like{background:#fff;border:0;border-radius:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:0.75rem;aspect-ratio:1/1}
-      .contact-form{width:100%;display:flex}
-      .contact-form form{display:flex;flex-direction:column;gap:0.5rem;width:100%}
-      .contact-form input,.contact-form textarea{width:100%;box-sizing:border-box;font-size:var(--ui-size);padding:0.5rem;border:0.0625rem solid #eee;border-radius:0;background:#fff;transition:box-shadow 120ms ease,border-color 120ms ease;font-family:inherit}
-      .contact-form input::placeholder,.contact-form textarea::placeholder{font-family:inherit;color:#777}
-      .contact-form textarea{min-height:6.5rem;resize:vertical}
-      .contact-form input:hover,.contact-form textarea:hover,
-      .contact-form input:focus,.contact-form textarea:focus,
-      .contact-form input:focus-visible,.contact-form textarea:focus-visible{
-        outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(195,78,78,0.08)
-      }
-      .contact-form button{font-size:var(--ui-size);padding:0 0.75rem;border:0;border-radius:0;background:var(--accent);color:#fff;cursor:pointer;width:100%;box-sizing:border-box;display:inline-block;height:var(--control-height);line-height:var(--control-height);text-align:center}
-      .contact-form button:hover{background:#a93b3b}
-      .contact-form .error{color:#b33;font-size:0.85rem}
-      .cell{background:#fff;border:0.0625rem solid #efece6;border-radius:0;overflow:hidden;display:block}
+      .cell{position:relative;background:#fff;border:0.0625rem solid #efece6;border-radius:0;overflow:hidden;display:block}
       .cell img{width:100%;height:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+      .select-btn{position:absolute;top:0.5rem;right:0.5rem;width:1.875rem;height:1.875rem;border-radius:50%;border:0;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;line-height:1;color:var(--accent);box-shadow:0 0.0625rem 0.25rem rgba(0,0,0,0.15)}
+      .select-btn.selected{background:var(--accent);color:#fff}
+      .select-btn:hover{box-shadow:0 0 0 4px rgba(195,78,78,0.12)}
+      .selected-square{position:relative;padding:0}
+      .selected-thumb{width:100%;height:100%;object-fit:cover;display:block}
+      .selected-remove{position:absolute;top:0.375rem;right:0.375rem;width:1.5rem;height:1.5rem;border-radius:50%;border:0;background:rgba(0,0,0,0.55);color:#fff;cursor:pointer;font-size:1rem;line-height:1}
+      .selected-label{position:absolute;left:0;right:0;bottom:0;padding:0.375rem 0.5rem;background:linear-gradient(transparent,rgba(0,0,0,0.65));color:#fff;font-size:0.8rem;text-align:left}
       .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,8,8,0.6);z-index:60}
       .modal.open{display:flex}
       .modal-nav{position:fixed;top:50%;transform:translateY(-50%);background:transparent;border:0;color:#fff;font-size:1.5rem;padding:0.5rem;cursor:pointer;z-index:70}
@@ -372,67 +366,90 @@
           bottomRow.className = 'bottom-row';
           grid.after(bottomRow);
         }
-        bottomRow.innerHTML = '';
 
-        // Contact info tile
-        const contactInfo = document.createElement('div');
-        contactInfo.className = 'cell-like';
-        const ci = document.createElement('div');
-        ci.style.textAlign = 'center';
-        ci.innerHTML = '<strong>Feel free to reach out!</strong>';
-        contactInfo.appendChild(ci);
-        bottomRow.appendChild(contactInfo);
+        // artworks the visitor has marked as "interested in"; keyed by item.src
+        // so it survives re-sorts (buildItems()/render() rebuild DOM, not this Set)
+        const selected = new Set();
 
-        // Contact form tile
-        const cf = document.createElement('div');
-        cf.className = 'cell-like contact-form';
-        const form = document.createElement('form');
-        form.innerHTML = '<input name="name" placeholder="Your name"><input name="email" placeholder="Your email"><textarea name="message" placeholder="Message" rows="4"></textarea><div><button type="submit">Send</button></div>';
-        // enhance contact form: require fields, validate email, then submit via Web3Forms
-        // (a free form-backend that emails info@cosaha.com directly — no server of our own needed)
-        // Sign up at https://web3forms.com with info@cosaha.com to get a real access key,
-        // then replace the placeholder below.
-        const WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
-        const errorSpan = document.createElement('div'); errorSpan.style.color = '#b33'; errorSpan.style.fontSize = '0.9rem'; errorSpan.style.marginBottom = '0.5rem';
-        form.prepend(errorSpan);
-        form.addEventListener('submit', async (e)=>{
-          e.preventDefault();
-          errorSpan.textContent = '';
-          const fd = new FormData(form);
-          const name = (fd.get('name') || '').trim();
-          const email = (fd.get('email') || '').trim();
-          const message = (fd.get('message') || '').trim();
-          if(!name || !email || !message){ errorSpan.textContent = 'Please fill all fields.'; return; }
-          const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-          if(!emailOk){ errorSpan.textContent = 'Please provide a valid email address.'; return; }
-          if(WEB3FORMS_ACCESS_KEY === 'YOUR_WEB3FORMS_ACCESS_KEY'){
-            errorSpan.textContent = 'Contact form is not fully set up yet — please email info@cosaha.com directly.';
-            return;
+        function setSelected(item, isSelected){
+          if(isSelected) selected.add(item.src); else selected.delete(item.src);
+          if(item._selectBtn){
+            item._selectBtn.classList.toggle('selected', isSelected);
+            item._selectBtn.textContent = isSelected ? '♥' : '♡';
+            item._selectBtn.setAttribute('aria-pressed', String(isSelected));
           }
-          const submitBtn = form.querySelector('button[type="submit"]');
-          if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
-          try{
-            const res = await fetch('https://api.web3forms.com/submit', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-              body: JSON.stringify({
-                access_key: WEB3FORMS_ACCESS_KEY,
-                subject: 'Website contact from ' + name,
-                from_name: name,
-                email: email,
-                message: message
-              })
-            });
-            const result = await res.json();
-            if(!result.success) throw new Error(result.message || 'Submission failed');
-            form.innerHTML = '<div style="font-weight:600">Thank you — your message has been sent.</div>';
-          }catch(err){
-            errorSpan.textContent = 'Sorry, something went wrong sending your message. Please try again or email info@cosaha.com directly.';
-            if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Send'; }
+          renderBottomRow();
+        }
+        function toggleSelect(item){ setSelected(item, !selected.has(item.src)); }
+
+        function selectedSquare(item){
+          const sq = document.createElement('div');
+          sq.className = 'cell-like selected-square';
+          const img = document.createElement('img');
+          img.src = encodeURI(item.src);
+          img.alt = item.title;
+          img.className = 'selected-thumb';
+          sq.appendChild(img);
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'selected-remove';
+          remove.setAttribute('aria-label', 'Remove ' + item.title);
+          remove.textContent = '×';
+          remove.addEventListener('click', (e)=>{ e.stopPropagation(); setSelected(item, false); });
+          sq.appendChild(remove);
+          const label = document.createElement('div');
+          label.className = 'selected-label';
+          label.textContent = item.title;
+          sq.appendChild(label);
+          return sq;
+        }
+
+        function mailTile(){
+          const tile = document.createElement('div');
+          tile.className = 'cell-like';
+          tile.style.textAlign = 'center';
+          tile.style.cursor = 'pointer';
+          const count = selected.size;
+          tile.innerHTML = count > 0
+            ? '<strong>Send inquiry</strong><div style="font-size:0.85em;color:#6b6a66;margin-top:0.25rem">' + count + ' artwork' + (count>1?'s':'') + ' selected</div>'
+            : '<strong>Contact us</strong><div style="font-size:0.85em;color:#6b6a66;margin-top:0.25rem">Select artworks you\'re interested in, or click to write to us</div>';
+          tile.addEventListener('click', ()=>{
+            const bySrc = new Map(items.map(it=>[it.src, it]));
+            const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
+            let subject, body;
+            if(chosen.length){
+              subject = 'Interest in artworks: ' + chosen.map(it=>it.title).join(', ');
+              body = "Hi,\n\nI'm interested in the following artworks:\n- " + chosen.map(it=>it.title).join('\n- ') + "\n\n";
+            } else {
+              subject = 'Website inquiry';
+              body = '';
+            }
+            window.location.href = 'mailto:info@cosaha.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+          });
+          return tile;
+        }
+
+        function renderBottomRow(){
+          bottomRow.innerHTML = '';
+
+          // Contact info tile
+          const contactInfo = document.createElement('div');
+          contactInfo.className = 'cell-like';
+          const ci = document.createElement('div');
+          ci.style.textAlign = 'center';
+          ci.innerHTML = '<strong>Feel free to reach out!</strong>';
+          contactInfo.appendChild(ci);
+          bottomRow.appendChild(contactInfo);
+
+          // squares for each artwork the visitor selected
+          const bySrc = new Map(items.map(it=>[it.src, it]));
+          for(const src of selected){
+            const it = bySrc.get(src);
+            if(it) bottomRow.appendChild(selectedSquare(it));
           }
-        });
-        cf.appendChild(form);
-        bottomRow.appendChild(cf);
+
+          // mail tile — composes a mailto: prefilled with the selection
+          bottomRow.appendChild(mailTile());
 
         // Impressum tile — opens modal with official Impressum text
         const imp = document.createElement('div');
@@ -496,14 +513,9 @@
             <p>Diese Daten werden verarbeitet, um den sicheren und störungsfreien Betrieb der Website zu gewährleisten.<br>
             Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.</p>
 
-            <h3>3. Kontaktformular</h3>
-            <p>Wenn du das Kontaktformular nutzt, werden die von dir eingegebenen Daten verarbeitet. Dies sind insbesondere:</p>
-            <ul>
-              <li>Name</li>
-              <li>E-Mail-Adresse</li>
-              <li>Nachricht</li>
-            </ul>
-            <p>Die Verarbeitung erfolgt ausschließlich zur Bearbeitung deiner Anfrage.<br>
+            <h3>3. Kontaktaufnahme</h3>
+            <p>Die Schaltfläche „Send inquiry“ / „Contact us“ öffnet lediglich dein lokales E-Mail-Programm mit einem vorausgefüllten Entwurf (mailto-Link). Dabei werden keine Daten an uns oder Dritte über die Website übertragen; die E-Mail wird erst versendet, wenn du sie in deinem eigenen E-Mail-Programm aktiv abschickst.<br>
+            Sofern du uns daraufhin eine E-Mail sendest, verarbeiten wir die darin enthaltenen Daten (z. B. Name, E-Mail-Adresse, Nachricht) ausschließlich zur Bearbeitung deiner Anfrage.<br>
             Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen) bzw. Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bearbeitung von Anfragen).<br>
             Die Daten werden nur so lange gespeichert, wie dies zur Bearbeitung deiner Anfrage erforderlich ist oder gesetzliche Aufbewahrungspflichten bestehen.</p>
 
@@ -543,12 +555,13 @@
         });
         bottomRow.appendChild(imp);
 
-        // Copyright tile
-        const copy = document.createElement('div');
-        copy.className = 'cell-like';
-        copy.style.textAlign = 'center';
-        copy.innerHTML = '&copy; ' + new Date().getFullYear() + ' Cosaha';
-        bottomRow.appendChild(copy);
+          // Copyright tile
+          const copy = document.createElement('div');
+          copy.className = 'cell-like';
+          copy.style.textAlign = 'center';
+          copy.innerHTML = '&copy; ' + new Date().getFullYear() + ' Cosaha';
+          bottomRow.appendChild(copy);
+        }
 
       let items = [];
 
@@ -621,6 +634,21 @@
         a.addEventListener('click', ()=>{
           openModalFor(item.idx);
         });
+
+        const isSelected = selected.has(item.src);
+        const selectBtn = document.createElement('button');
+        selectBtn.type = 'button';
+        selectBtn.className = 'select-btn' + (isSelected ? ' selected' : '');
+        selectBtn.textContent = isSelected ? '♥' : '♡';
+        selectBtn.setAttribute('aria-label', 'Mark as interested');
+        selectBtn.setAttribute('aria-pressed', String(isSelected));
+        selectBtn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          toggleSelect(item);
+        });
+        item._selectBtn = selectBtn;
+        a.appendChild(selectBtn);
+
         return a;
       }
 
@@ -766,6 +794,7 @@
 
       // Initial render
       render();
+      renderBottomRow();
 
       modal.addEventListener('click', (e)=>{
         // close only when clicking the backdrop, not when clicking modal content or nav buttons
