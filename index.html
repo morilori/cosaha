@@ -378,9 +378,17 @@
         // individual button references across multiple containers.
         function setSelected(item, isSelected){
           if(isSelected) selected.add(item.src); else selected.delete(item.src);
+          // rebuilding the grid can drop focus from the removed heart button
+          // and briefly collapse the page's scrollable height, which makes
+          // the browser reset scroll position — restore it explicitly
+          const scrollX = window.scrollX, scrollY = window.scrollY;
           render();
           renderBottomRow();
           renderSelectedRow();
+          window.scrollTo(scrollX, scrollY);
+          // some browsers apply a focus-loss scroll adjustment a frame later;
+          // reapply once more after layout settles to be safe
+          requestAnimationFrame(()=>window.scrollTo(scrollX, scrollY));
         }
         function toggleSelect(item){ setSelected(item, !selected.has(item.src)); }
 
