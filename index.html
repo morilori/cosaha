@@ -111,12 +111,20 @@
       #modal-next{right:1rem}
       .modal img{max-width:92vw;max-height:88vh;box-shadow:0 1.875rem 5rem rgba(0,0,0,0.5);border-radius:0}
       .caption{position:fixed;left:50%;transform:translateX(-50%);bottom:1.5rem;color:#fff;font-size:0.875rem}
-      .selection-bar{position:fixed;left:0;right:0;bottom:0;z-index:90;background:#fff;border-top:0.0625rem solid #e7e3dc;box-shadow:0 -0.125rem 0.5rem rgba(0,0,0,0.08)}
+      /* z-index below .modal (60) so opening the lightbox to view an
+         artwork puts the selection bar behind the dark overlay instead of
+         floating on top of it */
+      .selection-bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:0.0625rem solid #e7e3dc;box-shadow:0 -0.125rem 0.5rem rgba(0,0,0,0.08)}
       .selection-bar-inner{max-width:75rem;margin:0 auto;padding:0.75rem 1.125rem;display:flex;align-items:center;gap:0.75rem;font-size:var(--ui-size)}
       .selection-bar-label{font-weight:600;white-space:nowrap;flex-shrink:0}
       .selection-bar-names{flex:1;overflow-x:auto;white-space:nowrap;color:#6b6a66;font-size:var(--ui-size)}
       .selection-bar-inner .mail-send-btn{flex-shrink:0;white-space:nowrap}
-      body{padding-bottom:3.75rem}
+      /* real block-level spacer reserving room for the fixed selection bar
+         at the end of .wrap's content — more robust than body padding-bottom,
+         which depends on how html,body{height:100%} interacts with overflow.
+         4rem is a fallback for the instant before JS measures the bar's
+         actual height in renderSelectionBar() */
+      #bottom-spacer{height:4rem}
       @media (max-width:32.5rem){
         h1{font-size:1.375rem}
         .logo{height:4.5rem}
@@ -140,6 +148,7 @@
       </div>
 
       <div class="grid" id="grid"></div>
+      <div id="bottom-spacer"></div>
     </div>
 
     <div id="modal" class="modal" role="dialog" aria-hidden="true">
@@ -305,6 +314,17 @@
         large.alt = item ? item.title : titleFromPath(src);
         large.draggable = false;
         large.addEventListener('contextmenu', (e)=>e.preventDefault());
+        // double tap/double click the enlarged image toggles selection,
+        // same as pushing the heart button on the thumbnail — the modal can
+        // be showing any photo in the artwork's folder (via prev/next), not
+        // just its main thumbnail, so resolve the item by folder rather than
+        // by exact src match
+        large.addEventListener('dblclick', (e)=>{
+          e.preventDefault();
+          const folder = largeSrc.substring(0, largeSrc.lastIndexOf('/')) + '/';
+          const folderItem = item || items.find(it=>it.src.startsWith(folder));
+          if(folderItem) toggleSelect(folderItem);
+        });
         modalContent.appendChild(large);
         modal.setAttribute('aria-hidden','false');
         cap.textContent = item ? item.title : titleFromPath(src);
@@ -574,6 +594,11 @@
           bar.querySelector('.selection-bar-label').textContent = t('selectionBarLabel');
           bar.querySelector('.selection-bar-names').textContent = chosen.map(it=>it.title).join(', ');
           document.getElementById('request-availability-btn').textContent = t('requestAvailability');
+          // size the spacer to the bar's real height rather than hardcode it —
+          // a hardcoded value silently went stale the last time the bar's
+          // content changed (adding the button made it taller than the
+          // fixed spacer accounted for), overlapping the last row of the page
+          document.getElementById('bottom-spacer').style.height = bar.offsetHeight + 'px';
         }
 
         function renderBottomRow(){
@@ -701,7 +726,7 @@
           const copy = document.createElement('div');
           copy.className = 'cell-like';
           copy.style.textAlign = 'center';
-          copy.innerHTML = '&copy; ' + new Date().getFullYear() + ' Cosaha';
+          copy.innerHTML = '&copy; ' + new Date().getFullYear() + ' cosaha.com';
           bottomRow.appendChild(copy);
         }
 
