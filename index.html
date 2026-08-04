@@ -36,7 +36,7 @@
       .custom-select-button{background:#fff;border:0.0625rem solid #e7e3dc;border-radius:0;padding:0 0.75rem;font-size:var(--ui-size);display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;min-width:var(--select-width);max-width:var(--select-width);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:var(--control-height);}
       .custom-select-button:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(195,78,78,0.12)}
       .custom-select-list{position:absolute;right:0;left:0;margin-top:0.25rem;background:#fff;border:0.0625rem solid #e7e3dc;z-index:80;max-height:20rem;overflow:auto}
-      .custom-select-item{padding:0.5rem 0.75rem;cursor:pointer}
+      .custom-select-item{padding:0.5rem 0.75rem;font-size:var(--ui-size);cursor:pointer}
       .custom-select-item:hover{background:var(--accent);color:#fff}
       /* attempt to tint option hover where supported */
       .controls select option:hover{ background: rgba(195,78,78,0.06); }
@@ -93,7 +93,7 @@
       .controls-item{position:relative;background:#fff;border:0;display:flex;align-items:center;justify-content:center;padding:0.5rem;aspect-ratio:1/1}
       .controls-item .controls{width:100%;display:flex;align-items:center;justify-content:flex-start;padding-left:0.5rem}
       .lang-switch{position:absolute;top:0.5rem;right:0.5rem;display:flex;border:0.0625rem solid #e7e3dc;overflow:hidden}
-      .lang-btn{background:#fff;border:0;padding:0.25rem 0.5rem;font-size:0.75rem;cursor:pointer;color:#595853;line-height:1.2;font-family:inherit}
+      .lang-btn{background:#fff;border:0;padding:0 0.75rem;font-size:var(--ui-size);height:var(--control-height);cursor:pointer;color:#595853;font-family:inherit}
       .lang-btn.active{background:var(--accent);color:#fff}
       .lang-btn:hover:not(.active){background:#f5f2ec}
       /* bottom-row cells share the same look as other tiles */
@@ -112,7 +112,7 @@
       .modal img{max-width:92vw;max-height:88vh;box-shadow:0 1.875rem 5rem rgba(0,0,0,0.5);border-radius:0}
       .caption{position:fixed;left:50%;transform:translateX(-50%);bottom:1.5rem;color:#fff;font-size:0.875rem}
       .selection-bar{position:fixed;left:0;right:0;bottom:0;z-index:90;background:#fff;border-top:0.0625rem solid #e7e3dc;box-shadow:0 -0.125rem 0.5rem rgba(0,0,0,0.08)}
-      .selection-bar-inner{max-width:75rem;margin:0 auto;padding:0.75rem 1.125rem;display:flex;align-items:center;gap:0.75rem}
+      .selection-bar-inner{max-width:75rem;margin:0 auto;padding:0.75rem 1.125rem;display:flex;align-items:center;gap:0.75rem;font-size:var(--ui-size)}
       .selection-bar-label{font-weight:600;white-space:nowrap;flex-shrink:0}
       .selection-bar-names{flex:1;overflow-x:auto;white-space:nowrap;color:#6b6a66;font-size:var(--ui-size)}
       .selection-bar-inner .mail-send-btn{flex-shrink:0;white-space:nowrap}
@@ -130,7 +130,8 @@
         <select id="sort-select">
           <option value="newest">Newest</option>
           <option value="color">Color</option>
-          <option value="collection">Collection</option>
+          <option value="title">Title</option>
+          <option value="christmas">Christmas</option>
         </select>
         <div class="lang-switch" id="lang-switch">
           <button type="button" class="lang-btn active" data-lang="en">EN</button>
@@ -173,7 +174,8 @@
           sortBy: 'Sort by:',
           sortNewest: 'Newest',
           sortColor: 'Color',
-          sortCollection: 'Collection',
+          sortTitle: 'Title',
+          sortChristmas: 'Christmas',
           headline: 'Bring color into your home.',
           intro: 'I love experimenting with colors, shapes, textures, and materials. For my monoprints I use natural materials like leaves and grasses as well as everyday objects. Each work is unique and fits the square frame of the Gelli Plate.',
           reachOut: 'Reach out!',
@@ -194,7 +196,8 @@
           sortBy: 'Sortieren nach:',
           sortNewest: 'Neueste',
           sortColor: 'Farbe',
-          sortCollection: 'Kollektion',
+          sortTitle: 'Titel',
+          sortChristmas: 'Weihnachten',
           headline: 'Bring Farbe in \ndein Zuhause.',
           intro: 'Ich liebe das Experimentieren mit Farben, Formen, Texturen und Materialien. Für meine Monoprints verwende ich Naturmaterialien wie Blätter und Gräser sowie Alltagsgegenstände. Jedes Werk ist ein Unikat und passt in den quadratischen Rahmen der Gelli Plate.',
           reachOut: 'Melde dich!',
@@ -326,7 +329,7 @@
       const sortSelect = document.getElementById('sort-select');
 
       // build a custom-styled select UI to replace native dropdown visuals (so hover/focus use our accent)
-      const SORT_LABEL_KEYS = { newest: 'sortNewest', color: 'sortColor', collection: 'sortCollection' };
+      const SORT_LABEL_KEYS = { newest: 'sortNewest', color: 'sortColor', title: 'sortTitle', christmas: 'sortChristmas' };
 
       function sortOptionLabel(value){
         return t(SORT_LABEL_KEYS[value] || value);
@@ -450,13 +453,14 @@
         return {h, s: s*100, l: l*100};
       }
 
+      // shared with the 'color' sort mode, so sorting groups by perceptual
+      // family (this array's order) before fine-sorting by raw hue
+      const COLOR_NAMES = ['red','orange','yellow','lime','green','teal','cyan','blue','indigo','violet','magenta','crimson'];
+
       function hueToName(h){
         if (h == null || Number.isNaN(h)) return 'unknown';
-        const names = [
-          'red','orange','yellow','lime','green','teal','cyan','blue','indigo','violet','magenta','crimson'
-        ];
-        const index = Math.round(((h % 360) / 360) * names.length) % names.length;
-        return names[index];
+        const index = Math.round(((h % 360) / 360) * COLOR_NAMES.length) % COLOR_NAMES.length;
+        return COLOR_NAMES[index];
       }
 
       function computeImageHue(img){
@@ -595,6 +599,8 @@
         imp.addEventListener('click', ()=>{
           modal.classList.add('open');
           modalContent.innerHTML = '';
+          modalPrev.style.display = 'none';
+          modalNext.style.display = 'none';
           const wrapper = document.createElement('div');
           wrapper.style.maxWidth = '92vw';
           wrapper.style.maxHeight = '88vh';
@@ -796,7 +802,6 @@
       function render(){
         const mode = sortSelect.value;
         const list = items.slice();
-        const seasonOrder = { 'Winter':0, 'Spring':1, 'Summer':2, 'Autumn':3, 'Unknown':4 };
         list.sort((a,b)=>{
           switch(mode){
             case 'newest': {
@@ -808,17 +813,25 @@
             case 'title':
               return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
             case 'color': {
+              // group by perceptual color family first (COLOR_NAMES order) so
+              // e.g. hue 359 and hue 1 land together as "red" instead of at
+              // opposite ends of a raw 0-360 sweep; fine-sort within a family
+              // by hue, then lightness
+              const af = COLOR_NAMES.indexOf(a.colorName); const bf = COLOR_NAMES.indexOf(b.colorName);
+              const abucket = af === -1 ? COLOR_NAMES.length : af;
+              const bbucket = bf === -1 ? COLOR_NAMES.length : bf;
+              if (abucket !== bbucket) return abucket - bbucket;
               const ah = a.hue ?? 9999; const bh = b.hue ?? 9999;
               if (ah !== bh) return ah - bh;
               const al = a.lightness ?? 9999; const bl = b.lightness ?? 9999;
               return al - bl;
             }
-            case 'season':
-              return (seasonOrder[a.season] ?? 99) - (seasonOrder[b.season] ?? 99)
-                || a.title.localeCompare(b.title);
-            case 'collection':
-              return a.collection.localeCompare(b.collection, undefined, {sensitivity:'base'})
-                || a.title.localeCompare(b.title);
+            case 'christmas': {
+              const ax = a.collection === 'Weihnachten' ? 0 : 1;
+              const bx = b.collection === 'Weihnachten' ? 0 : 1;
+              if (ax !== bx) return ax - bx;
+              return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
+            }
             default:
               return a.idx - b.idx; // original order
           }
