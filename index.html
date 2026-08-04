@@ -662,7 +662,9 @@
         const selectBtn = document.createElement('button');
         selectBtn.type = 'button';
         selectBtn.className = 'select-btn' + (isSelected ? ' selected' : '');
-        selectBtn.textContent = isSelected ? '♥' : '♡';
+        // fixed geometric marker — only its color/background changes on
+        // selection (via the .selected class), never its shape
+        selectBtn.textContent = '◆';
         selectBtn.setAttribute('aria-label', 'Mark as interested');
         selectBtn.setAttribute('aria-pressed', String(isSelected));
         selectBtn.addEventListener('click', (e)=>{
