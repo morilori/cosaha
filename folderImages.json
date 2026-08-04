@@ -1,8 +1,4 @@
 {
-  "Art/": [
-    "Art/frame_back.jpg",
-    "Art/frame_side.jpg"
-  ],
   "Art/39/": [
     "Art/39/39_20260321_113547.jpg"
   ],
@@ -176,6 +172,10 @@
     "Art/25_goldener%20Weihnachtsduft/20251119_154827.jpg",
     "Art/25_goldener%20Weihnachtsduft/20251119_155546.jpg",
     "Art/25_goldener%20Weihnachtsduft/25_main.jpg"
+  ],
+  "Art/Frame/": [
+    "Art/Frame/frame_back.jpg",
+    "Art/Frame/frame_side.jpg"
   ],
   "Art/32-weihnachtliches Schneegestöber/": [
     "Art/32-weihnachtliches%20Schneegest%C3%B6ber/20251128_151200.jpg",
