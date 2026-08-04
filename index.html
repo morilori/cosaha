@@ -46,19 +46,17 @@
       .top-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-bottom:0.875rem}
       .bottom-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-top:1.25rem}
       .selected-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-top:1.25rem}
-      .mail-tile-inner{display:flex;flex-direction:column;align-items:center;gap:0.5rem;width:100%}
-      .mail-tile-titles{font-size:0.85em;color:#6b6a66;max-height:4.5rem;overflow-y:auto;user-select:text;cursor:text}
       .mail-send-btn{font-size:var(--ui-size);padding:0 0.75rem;border:0;border-radius:0;background:var(--accent);color:#fff;cursor:pointer;height:var(--control-height);line-height:var(--control-height)}
       .mail-send-btn:hover{background:#a93b3b}
       .grid{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem}
       @media (max-width:64rem){
-        .grid{grid-template-columns:repeat(3,minmax(12.5rem,1fr));}
+        .grid,.top-row,.bottom-row,.selected-row{grid-template-columns:repeat(3,minmax(12.5rem,1fr));}
       }
       @media (max-width:48rem){
-        .grid{grid-template-columns:repeat(2,minmax(12.5rem,1fr));}
+        .grid,.top-row,.bottom-row,.selected-row{grid-template-columns:repeat(2,minmax(12.5rem,1fr));}
       }
       @media (max-width:32.5rem){
-        .grid{grid-template-columns:repeat(1,minmax(12.5rem,1fr));}
+        .grid,.top-row,.bottom-row,.selected-row{grid-template-columns:repeat(1,minmax(12.5rem,1fr));}
       }
       /* match artwork cell appearance and force square aspect */
       .logo-item, .headline-item, .text-item{
@@ -113,6 +111,12 @@
       #modal-next{right:1rem}
       .modal img{max-width:92vw;max-height:88vh;box-shadow:0 1.875rem 5rem rgba(0,0,0,0.5);border-radius:0}
       .caption{position:fixed;left:50%;transform:translateX(-50%);bottom:1.5rem;color:#fff;font-size:0.875rem}
+      .selection-bar{position:fixed;left:0;right:0;bottom:0;z-index:90;background:#fff;border-top:0.0625rem solid #e7e3dc;box-shadow:0 -0.125rem 0.5rem rgba(0,0,0,0.08)}
+      .selection-bar-inner{max-width:75rem;margin:0 auto;padding:0.75rem 1.125rem;display:flex;align-items:center;gap:0.75rem}
+      .selection-bar-label{font-weight:600;white-space:nowrap;flex-shrink:0}
+      .selection-bar-names{flex:1;overflow-x:auto;white-space:nowrap;color:#6b6a66;font-size:var(--ui-size)}
+      .selection-bar-inner .mail-send-btn{flex-shrink:0;white-space:nowrap}
+      body{padding-bottom:3.75rem}
       @media (max-width:32.5rem){
         h1{font-size:1.375rem}
         .logo{height:4.5rem}
@@ -144,6 +148,14 @@
     </div>
     <div id="cap" class="caption" aria-hidden="true"></div>
 
+    <div id="selection-bar" class="selection-bar">
+      <div class="selection-bar-inner">
+        <span class="selection-bar-label"></span>
+        <span class="selection-bar-names"></span>
+        <button type="button" id="request-availability-btn" class="mail-send-btn"></button>
+      </div>
+    </div>
+
     <script>
       // artworkSources will be derived at runtime from folderImages.json
       // so the site updates automatically when that file is regenerated.
@@ -164,11 +176,9 @@
           sortCollection: 'Collection',
           headline: 'Bring color into your home.',
           intro: 'I love experimenting with colors, shapes, textures, and materials. For my monoprints I use natural materials like leaves and grasses as well as everyday objects. Each work is unique and fits the square frame of the Gelli Plate.',
-          reachOut: 'Feel free to reach out!',
-          sendInquiry: 'Send inquiry',
-          contactUs: 'Contact us',
-          selectHint: "Select artworks you're interested in, or send us a message",
-          sendEmail: 'Send email',
+          reachOut: 'Reach out!',
+          selectionBarLabel: 'Selected Artworks:',
+          requestAvailability: 'Request Availability',
           impressum: 'Impressum',
           prevAria: 'Previous',
           nextAria: 'Next',
@@ -187,11 +197,9 @@
           sortCollection: 'Kollektion',
           headline: 'Bring Farbe in \ndein Zuhause.',
           intro: 'Ich liebe das Experimentieren mit Farben, Formen, Texturen und Materialien. Für meine Monoprints verwende ich Naturmaterialien wie Blätter und Gräser sowie Alltagsgegenstände. Jedes Werk ist ein Unikat und passt in den quadratischen Rahmen der Gelli Plate.',
-          reachOut: 'Melde dich gerne!',
-          sendInquiry: 'Anfrage senden',
-          contactUs: 'Kontakt',
-          selectHint: 'Wähle Kunstwerke aus, die dich interessieren und schreib uns:',
-          sendEmail: 'E-Mail senden',
+          reachOut: 'Melde dich!',
+          selectionBarLabel: 'Ausgewählte Kunstwerke:',
+          requestAvailability: 'Verfügbarkeit anfragen',
           impressum: 'Impressum',
           prevAria: 'Zurück',
           nextAria: 'Weiter',
@@ -382,12 +390,15 @@
         render();
         renderBottomRow();
         renderSelectedRow();
+        renderSelectionBar();
       }
 
       document.getElementById('lang-switch').addEventListener('click', (e)=>{
         const btn = e.target.closest('.lang-btn');
         if(btn) setLang(btn.dataset.lang);
       });
+
+      document.getElementById('request-availability-btn').addEventListener('click', composeInquiryMailto);
 
       function titleFromPath(p){
         const part = p.split('/')[1]||p;
@@ -497,6 +508,7 @@
           render();
           renderBottomRow();
           renderSelectedRow();
+          renderSelectionBar();
           window.scrollTo(scrollX, scrollY);
           // some browsers apply a focus-loss scroll adjustment a frame later;
           // reapply once more after layout settles to be safe
@@ -504,50 +516,27 @@
         }
         function toggleSelect(item){ setSelected(item, !selected.has(item.src)); }
 
+        // shared by the mail tile's "Send email" button and the selection
+        // bar's "Request Availability" button
+        function composeInquiryMailto(){
+          const bySrc = new Map(items.map(it=>[it.src, it]));
+          const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
+          let subject, body;
+          if(chosen.length){
+            subject = t('mailSubjectPrefix') + chosen.map(it=>it.title).join(', ');
+            body = t('mailGreeting') + chosen.map(it=>it.title).join('\n- ') + "\n\n";
+          } else {
+            subject = t('mailSubjectGeneric');
+            body = '';
+          }
+          window.location.href = 'mailto:info@cosaha.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        }
+
         function mailTile(){
           const tile = document.createElement('div');
           tile.className = 'cell-like mail-tile';
-          tile.style.textAlign = 'center';
-
-          const bySrc = new Map(items.map(it=>[it.src, it]));
-          const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
-
-          // single flex-column wrapper: .cell-like itself is a row flexbox,
-          // so this keeps heading / title list / button stacked
-          const inner = document.createElement('div');
-          inner.className = 'mail-tile-inner';
-
-          const heading = document.createElement('strong');
-          heading.textContent = chosen.length ? t('sendInquiry') : t('contactUs');
-          inner.appendChild(heading);
-
-          // plain selectable text (not just implied by a click handler) so the
-          // visitor can copy the list of titles themselves if they want to
-          const info = document.createElement('div');
-          info.className = 'mail-tile-titles';
-          info.textContent = chosen.length
-            ? chosen.map(it=>it.title).join(', ')
-            : t('selectHint');
-          inner.appendChild(info);
-
-          const sendBtn = document.createElement('button');
-          sendBtn.type = 'button';
-          sendBtn.className = 'mail-send-btn';
-          sendBtn.textContent = t('sendEmail');
-          sendBtn.addEventListener('click', ()=>{
-            let subject, body;
-            if(chosen.length){
-              subject = t('mailSubjectPrefix') + chosen.map(it=>it.title).join(', ');
-              body = t('mailGreeting') + chosen.map(it=>it.title).join('\n- ') + "\n\n";
-            } else {
-              subject = t('mailSubjectGeneric');
-              body = '';
-            }
-            window.location.href = 'mailto:info@cosaha.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-          });
-          inner.appendChild(sendBtn);
-
-          tile.appendChild(inner);
+          tile.style.justifyContent = 'flex-start';
+          tile.innerHTML = '<a href="mailto:info@cosaha.com" style="color:inherit;text-decoration:none">info@cosaha.com</a>';
           return tile;
         }
 
@@ -569,6 +558,18 @@
           for(const it of chosen){
             selectedRow.appendChild(cellFor(it));
           }
+        }
+
+        // fixed bar at the bottom of the screen listing selected artwork
+        // titles, so they're visible while scrolling the gallery — always
+        // shown, even with nothing selected yet
+        function renderSelectionBar(){
+          const bar = document.getElementById('selection-bar');
+          const bySrc = new Map(items.map(it=>[it.src, it]));
+          const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
+          bar.querySelector('.selection-bar-label').textContent = t('selectionBarLabel');
+          bar.querySelector('.selection-bar-names').textContent = chosen.map(it=>it.title).join(', ');
+          document.getElementById('request-availability-btn').textContent = t('requestAvailability');
         }
 
         function renderBottomRow(){
@@ -940,6 +941,7 @@
       render();
       renderBottomRow();
       renderSelectedRow();
+      renderSelectionBar();
 
       modal.addEventListener('click', (e)=>{
         // close only when clicking the backdrop, not when clicking modal content or nav buttons
