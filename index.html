@@ -46,6 +46,10 @@
       .top-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-bottom:0.875rem}
       .bottom-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-top:1.25rem}
       .selected-row{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem;margin-top:1.25rem}
+      .mail-tile-inner{display:flex;flex-direction:column;align-items:center;gap:0.5rem;width:100%}
+      .mail-tile-titles{font-size:0.85em;color:#6b6a66;max-height:4.5rem;overflow-y:auto;user-select:text;cursor:text}
+      .mail-send-btn{font-size:var(--ui-size);padding:0 0.75rem;border:0;border-radius:0;background:var(--accent);color:#fff;cursor:pointer;height:var(--control-height);line-height:var(--control-height)}
+      .mail-send-btn:hover{background:#a93b3b}
       .grid{display:grid;grid-template-columns:repeat(4,minmax(12.5rem,1fr));gap:0.875rem}
       @media (max-width:64rem){
         .grid{grid-template-columns:repeat(3,minmax(12.5rem,1fr));}
@@ -382,16 +386,35 @@
 
         function mailTile(){
           const tile = document.createElement('div');
-          tile.className = 'cell-like';
+          tile.className = 'cell-like mail-tile';
           tile.style.textAlign = 'center';
-          tile.style.cursor = 'pointer';
-          const count = selected.size;
-          tile.innerHTML = count > 0
-            ? '<strong>Send inquiry</strong><div style="font-size:0.85em;color:#6b6a66;margin-top:0.25rem">' + count + ' artwork' + (count>1?'s':'') + ' selected</div>'
-            : '<strong>Contact us</strong><div style="font-size:0.85em;color:#6b6a66;margin-top:0.25rem">Select artworks you\'re interested in, or click to write to us</div>';
-          tile.addEventListener('click', ()=>{
-            const bySrc = new Map(items.map(it=>[it.src, it]));
-            const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
+
+          const bySrc = new Map(items.map(it=>[it.src, it]));
+          const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
+
+          // single flex-column wrapper: .cell-like itself is a row flexbox,
+          // so this keeps heading / title list / button stacked
+          const inner = document.createElement('div');
+          inner.className = 'mail-tile-inner';
+
+          const heading = document.createElement('strong');
+          heading.textContent = chosen.length ? 'Send inquiry' : 'Contact us';
+          inner.appendChild(heading);
+
+          // plain selectable text (not just implied by a click handler) so the
+          // visitor can copy the list of titles themselves if they want to
+          const info = document.createElement('div');
+          info.className = 'mail-tile-titles';
+          info.textContent = chosen.length
+            ? chosen.map(it=>it.title).join(', ')
+            : "Select artworks you're interested in, or send us a message";
+          inner.appendChild(info);
+
+          const sendBtn = document.createElement('button');
+          sendBtn.type = 'button';
+          sendBtn.className = 'mail-send-btn';
+          sendBtn.textContent = 'Send email';
+          sendBtn.addEventListener('click', ()=>{
             let subject, body;
             if(chosen.length){
               subject = 'Interest in artworks: ' + chosen.map(it=>it.title).join(', ');
@@ -402,6 +425,9 @@
             }
             window.location.href = 'mailto:info@cosaha.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
           });
+          inner.appendChild(sendBtn);
+
+          tile.appendChild(inner);
           return tile;
         }
 
