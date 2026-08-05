@@ -84,6 +84,10 @@
       .text-item.side-right .phi{text-align:left}
       .text-item.side-left{justify-content:flex-end;padding-right:0.75rem;padding-left:0.5rem}
       .text-item.side-left .phi{text-align:right}
+      /* single-column view: always below the artwork, top-left aligned,
+         instead of the alternating side-left/side-right layout */
+      .text-item.single-col{align-items:flex-start;justify-content:flex-start;padding-left:0.75rem;padding-right:0.75rem}
+      .text-item.single-col .phi{text-align:left}
       .text-item .title{font-weight:600;margin-bottom:0.25rem;font-size:var(--ui-size)}
       .text-item .meta{font-size:var(--ui-size);color:#6b6a66}
       /* single philosophy cell (one tile) */
@@ -104,18 +108,24 @@
       .select-btn{position:absolute;top:0.5rem;right:0.5rem;width:1.875rem;height:1.875rem;border-radius:50%;border:0;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;line-height:1;color:var(--accent);box-shadow:0 0.0625rem 0.25rem rgba(0,0,0,0.15)}
       .select-btn.selected{background:var(--accent);color:#fff}
       .select-btn:hover{box-shadow:0 0 0 4px rgba(195,78,78,0.12)}
-      .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,8,8,0.6);z-index:60}
+      /* padding-bottom fallback (matches #bottom-spacer's fallback) —
+         reserves room so the enlarged image never sits under the always-
+         on-top selection bar; kept in sync with the bar's real height by
+         renderSelectionBar() */
+      .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,8,8,0.6);z-index:60;box-sizing:border-box;padding-bottom:4rem}
       .modal.open{display:flex}
       .modal-nav{position:fixed;top:50%;transform:translateY(-50%);background:transparent;border:0;color:#fff;font-size:1.5rem;padding:0.5rem;cursor:pointer;z-index:70}
       #modal-prev{left:1rem}
       #modal-next{right:1rem}
       .modal img{max-width:92vw;max-height:88vh;box-shadow:0 1.875rem 5rem rgba(0,0,0,0.5);border-radius:0}
-      .caption{position:fixed;left:50%;transform:translateX(-50%);bottom:1.5rem;color:#fff;font-size:0.875rem}
-      /* z-index below .modal (60) so opening the lightbox to view an
-         artwork puts the selection bar behind the dark overlay instead of
-         floating on top of it */
-      .selection-bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:0.0625rem solid #e7e3dc;box-shadow:0 -0.125rem 0.5rem rgba(0,0,0,0.08)}
-      .selection-bar-inner{max-width:75rem;margin:0 auto;padding:0.75rem 1.125rem;display:flex;align-items:center;gap:0.75rem;font-size:var(--ui-size)}
+      /* bottom offset includes the (JS-set) selection bar height, so the
+         caption doesn't render underneath the always-on-top bar */
+      .caption{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(1.5rem + var(--selection-bar-height, 4rem));color:#fff;font-size:0.875rem}
+      /* always above .modal (60) so it stays visible while viewing an
+         artwork; the modal reserves matching bottom space (set in
+         renderSelectionBar()) so the enlarged image never sits under it */
+      .selection-bar{position:fixed;left:0;right:0;bottom:0;z-index:95;background:#fff;border-top:0.0625rem solid #e7e3dc;box-shadow:0 -0.125rem 0.5rem rgba(0,0,0,0.08)}
+      .selection-bar-inner{max-width:75rem;margin:0 auto;padding:0.5rem 1.125rem;display:flex;align-items:center;gap:0.75rem;font-size:var(--ui-size)}
       .selection-bar-label{font-weight:600;white-space:nowrap;flex-shrink:0}
       .selection-bar-names{flex:1;overflow-x:auto;white-space:nowrap;color:#6b6a66;font-size:var(--ui-size)}
       .selection-bar-inner .mail-send-btn{flex-shrink:0;white-space:nowrap}
@@ -594,11 +604,15 @@
           bar.querySelector('.selection-bar-label').textContent = t('selectionBarLabel');
           bar.querySelector('.selection-bar-names').textContent = chosen.map(it=>it.title).join(', ');
           document.getElementById('request-availability-btn').textContent = t('requestAvailability');
-          // size the spacer to the bar's real height rather than hardcode it —
-          // a hardcoded value silently went stale the last time the bar's
-          // content changed (adding the button made it taller than the
-          // fixed spacer accounted for), overlapping the last row of the page
-          document.getElementById('bottom-spacer').style.height = bar.offsetHeight + 'px';
+          // size the spacer (and the modal's reserved bottom space) to the
+          // bar's real height rather than hardcode it — a hardcoded value
+          // silently went stale the last time the bar's content changed
+          // (adding the button made it taller than a fixed guess accounted
+          // for), overlapping the last row of the page / the lightbox image
+          const barHeight = bar.offsetHeight + 'px';
+          document.getElementById('bottom-spacer').style.height = barHeight;
+          modal.style.paddingBottom = barHeight;
+          document.documentElement.style.setProperty('--selection-bar-height', barHeight);
         }
 
         function renderBottomRow(){
@@ -934,10 +948,13 @@
         const preCount = grid.children.length;
         let idx = 0;
         let rowIndex = Math.floor(preCount / computedCols);
+        // single-column view: always artwork-then-text, top-left aligned,
+        // instead of the normal alternating side-left/side-right layout
+        const singleCol = computedCols < 2;
         while (idx < pairs.length) {
           const rowSlice = pairs.slice(idx, idx + pairsPerRow);
           // start rows with the text cell (offset parity so text appears first)
-          const artworkFirst = (rowIndex % 2 !== 0);
+          const artworkFirst = singleCol ? true : (rowIndex % 2 !== 0);
           for (const art of rowSlice) {
             const artCell = cellFor(art);
             const titleCell = document.createElement('div');
@@ -952,7 +969,11 @@
             titleCell.appendChild(tp);
             art._metaDiv = metaDiv;
 
-            if (artworkFirst) {
+            if (singleCol) {
+              grid.appendChild(artCell);
+              titleCell.classList.add('single-col');
+              grid.appendChild(titleCell);
+            } else if (artworkFirst) {
               grid.appendChild(artCell);
               titleCell.classList.add('side-right');
               grid.appendChild(titleCell);
