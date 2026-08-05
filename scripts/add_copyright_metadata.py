@@ -37,12 +37,14 @@ def tag_file(path):
     except Exception:
         exif_dict = {'0th': {}, 'Exif': {}, 'GPS': {}, '1st': {}, 'thumbnail': None}
 
-    # some phone exports have a malformed UserComment (37500) that piexif
-    # parses but can't re-serialize (raises "wrong type of exif value");
-    # drop it rather than fail — we don't need to preserve it
+    # some phone exports have a malformed UserComment (37510 / 0x9286) that
+    # piexif parses but can't re-serialize (raises "wrong type of exif
+    # value"); drop it rather than fail — we don't need to preserve it.
+    # (Previously checked tag 37500 by mistake, which isn't UserComment at
+    # all, so this never actually caught anything.)
     exif_ifd = exif_dict.get('Exif') or {}
-    if not isinstance(exif_ifd.get(37500), (bytes, type(None))):
-        del exif_ifd[37500]
+    if not isinstance(exif_ifd.get(0x9286), (bytes, type(None))):
+        del exif_ifd[0x9286]
         exif_dict['Exif'] = exif_ifd
 
     zeroth = exif_dict.get('0th') or {}
