@@ -4,19 +4,32 @@ corner of every artwork image in Art/ — a visible copyright notice burned
 into the actual pixels (unlike scripts/add_copyright_metadata.py, which
 only edits EXIF and is invisible/strippable by a screenshot).
 
-Run manually whenever new art is added (after scripts/update_artworks.py):
+Run manually whenever new art is added (after scripts/update_artworks.py),
+then follow with scripts/add_copyright_metadata.py:
   python3 scripts/add_copyright_overlay.py
+  python3 scripts/add_copyright_metadata.py
 
-Safe to re-run: already-processed files are detected via a JPEG EXIF
-marker and skipped, so it won't stack a second copyright line.
+Safe to re-run: already-processed files are skipped (see already_marked
+below) so it won't stack a second copyright line.
 
 IMPORTANT — run this BEFORE scripts/add_copyright_metadata.py, not after.
 This script recompresses the image (Pillow re-encode) and only carries
-forward a fresh EXIF dict with its own marker tag; any other EXIF fields
-present when it runs (Artist/Copyright from the metadata script, camera
-info, etc.) are dropped. Running the metadata script second (it uses
-piexif, which edits only the EXIF segment and preserves everything else)
-restores those tags without touching the now-watermarked pixels.
+forward a fresh EXIF dict; any other EXIF fields present when it runs
+(Artist/Copyright from the metadata script, camera info, etc.) are
+dropped. Running the metadata script second (it uses piexif, which edits
+only the EXIF segment and preserves everything else) restores those tags
+without touching the now-watermarked pixels.
+
+Note on the "already processed" check: an earlier version of this script
+stamped its own EXIF UserComment marker and checked that on re-run. It
+turned out that tag doesn't survive a round trip through
+add_copyright_metadata.py's piexif.load()/insert() — every file that had
+been through both scripts came back with the marker silently gone, so
+every re-run re-watermarked (and re-compressed) the entire Art/ tree
+instead of only new files. The Artist tag piexif *does* preserve
+reliably (verified against already-committed files), so we key off that
+field being set by the metadata script instead — a file only reaches
+that state once the whole pipeline has completed for it.
 """
 import os
 from pathlib import Path
@@ -24,8 +37,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / 'Art'
-MARKER = 'cosaha-copyright-overlay-v1'
-USER_COMMENT_TAG = 0x9286
+ARTIST_TAG = 0x013B  # matches ARTIST in add_copyright_metadata.py
+ARTIST = 'Cordula Saupe-Hartstang'
 TEXT = '© cosaha.com'
 FONT_PATH = '/System/Library/Fonts/Supplemental/Arial.ttf'
 BAR_COLOR = (195, 78, 78, 255)  # site's --accent color, #C34E4E
@@ -37,7 +50,7 @@ def is_image(name):
 
 def already_marked(im):
     try:
-        return im.getexif().get(USER_COMMENT_TAG) == MARKER
+        return im.getexif().get(ARTIST_TAG) == ARTIST
     except Exception:
         return False
 
@@ -82,9 +95,7 @@ def process(path):
     draw_copyright(overlay, w, h)
 
     out = Image.alpha_composite(im, overlay).convert('RGB')
-    exif = out.getexif()
-    exif[USER_COMMENT_TAG] = MARKER
-    out.save(path, quality=90, exif=exif)
+    out.save(path, quality=90)
     return True
 
 
