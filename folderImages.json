@@ -16,19 +16,31 @@
     "Art/23-Bla%CC%88ttertanz%20im%20Sonnenlicht/23_main.jpg",
     "Art/23-Bla%CC%88ttertanz%20im%20Sonnenlicht/Screenshot_20251119_203747_Perplexity.jpg"
   ],
-  "Art/9-Twins Blau/": [
-    "Art/9-Twins%20Blau/9.1_20250812_195709.jpg",
-    "Art/9-Twins%20Blau/9.1_20251101_092504.jpg",
-    "Art/9-Twins%20Blau/9.1_20251101_093542.jpg",
-    "Art/9-Twins%20Blau/9.1_20251101_103301.jpg",
-    "Art/9-Twins%20Blau/9.2_20250812_195850.jpg",
-    "Art/9-Twins%20Blau/9.2_20251101_092557.jpg",
-    "Art/9-Twins%20Blau/9.2_20251101_093628.jpg",
-    "Art/9-Twins%20Blau/9.2_20251101_094251.jpg",
-    "Art/9-Twins%20Blau/9.2_20251101_103013.jpg",
-    "Art/9-Twins%20Blau/9_20251101_105244.jpg",
-    "Art/9-Twins%20Blau/9_20251101_105311.jpg",
-    "Art/9-Twins%20Blau/9_main.jpg"
+  "Art/9-Twin 1 Blau/": [
+    "Art/9-Twin%201%20Blau/9.1_20250812_195709.jpg",
+    "Art/9-Twin%201%20Blau/9.1_20251101_092504.jpg",
+    "Art/9-Twin%201%20Blau/9.1_20251101_093542.jpg",
+    "Art/9-Twin%201%20Blau/9.1_20251101_103301.jpg",
+    "Art/9-Twin%201%20Blau/9.2_20250812_195850.jpg",
+    "Art/9-Twin%201%20Blau/9.2_20251101_092557.jpg",
+    "Art/9-Twin%201%20Blau/9.2_20251101_093628.jpg",
+    "Art/9-Twin%201%20Blau/9.2_20251101_094251.jpg",
+    "Art/9-Twin%201%20Blau/9.2_20251101_103013.jpg",
+    "Art/9-Twin%201%20Blau/9_20251101_105244.jpg",
+    "Art/9-Twin%201%20Blau/9_20251101_105311.jpg",
+    "Art/9-Twin%201%20Blau/9_main.jpg"
+  ],
+  "Art/8-Twin 1 Orange/": [
+    "Art/8-Twin%201%20Orange/8.1_20250713_160050%20%281%29.jpg",
+    "Art/8-Twin%201%20Orange/8.1_20251101_092026.jpg",
+    "Art/8-Twin%201%20Orange/8.1_20251101_095638.jpg",
+    "Art/8-Twin%201%20Orange/8.1_20251101_104410.jpg",
+    "Art/8-Twin%201%20Orange/8.2_20250713_160101.jpg",
+    "Art/8-Twin%201%20Orange/8.2_20251101_092125.jpg",
+    "Art/8-Twin%201%20Orange/8.2_20251101_095513.jpg",
+    "Art/8-Twin%201%20Orange/8.2_20251101_104549.jpg",
+    "Art/8-Twin%201%20Orange/8_20251101_105416.jpg",
+    "Art/8-Twin%201%20Orange/8_main.jpg"
   ],
   "Art/6-Sonnenstrahlen auf Holz/": [
     "Art/6-Sonnenstrahlen%20auf%20Holz/6_20251101_091826.jpg",
@@ -324,20 +336,20 @@
   "Art/75-Verwirrung/": [
     "Art/75-Verwirrung/75_20260514_165941_Verwirrung.jpg"
   ],
-  "Art/Twins blau/": [
-    "Art/Twins%20blau/20250812_195709.jpg",
-    "Art/Twins%20blau/20250812_195850.jpg",
-    "Art/Twins%20blau/20251101_092504.jpg",
-    "Art/Twins%20blau/20251101_092557.jpg",
-    "Art/Twins%20blau/20251101_093542.jpg",
-    "Art/Twins%20blau/20251101_093628.jpg",
-    "Art/Twins%20blau/20251101_103013.jpg",
-    "Art/Twins%20blau/20251101_103013_2.jpg",
-    "Art/Twins%20blau/20251101_103301.jpg",
-    "Art/Twins%20blau/20251101_103301_2.jpg",
-    "Art/Twins%20blau/20251101_105223.jpg",
-    "Art/Twins%20blau/20251101_105244.jpg",
-    "Art/Twins%20blau/20251101_105311.jpg"
+  "Art/Twins Blau/": [
+    "Art/Twins%20Blau/20250812_195709.jpg",
+    "Art/Twins%20Blau/20250812_195850.jpg",
+    "Art/Twins%20Blau/20251101_092504.jpg",
+    "Art/Twins%20Blau/20251101_092557.jpg",
+    "Art/Twins%20Blau/20251101_093542.jpg",
+    "Art/Twins%20Blau/20251101_093628.jpg",
+    "Art/Twins%20Blau/20251101_103013.jpg",
+    "Art/Twins%20Blau/20251101_103013_2.jpg",
+    "Art/Twins%20Blau/20251101_103301.jpg",
+    "Art/Twins%20Blau/20251101_103301_2.jpg",
+    "Art/Twins%20Blau/20251101_105223.jpg",
+    "Art/Twins%20Blau/20251101_105244.jpg",
+    "Art/Twins%20Blau/20251101_105311.jpg"
   ],
   "Art/33-Sommer am See/": [
     "Art/33-Sommer%20am%20See/20251128_151219.jpg",
@@ -430,18 +442,6 @@
   ],
   "Art/47-Unterwasserwelt 1/": [
     "Art/47-Unterwasserwelt%201/47_20260402_103243_Unterwasserwelt_1.jpg"
-  ],
-  "Art/8-Twins Orange/": [
-    "Art/8-Twins%20Orange/8.1_20250713_160050%20%281%29.jpg",
-    "Art/8-Twins%20Orange/8.1_20251101_092026.jpg",
-    "Art/8-Twins%20Orange/8.1_20251101_095638.jpg",
-    "Art/8-Twins%20Orange/8.1_20251101_104410.jpg",
-    "Art/8-Twins%20Orange/8.2_20250713_160101.jpg",
-    "Art/8-Twins%20Orange/8.2_20251101_092125.jpg",
-    "Art/8-Twins%20Orange/8.2_20251101_095513.jpg",
-    "Art/8-Twins%20Orange/8.2_20251101_104549.jpg",
-    "Art/8-Twins%20Orange/8_20251101_105416.jpg",
-    "Art/8-Twins%20Orange/8_main.jpg"
   ],
   "Art/38-Rotes Labyrinth/": [
     "Art/38-Rotes%20Labyrinth/38_20260220_103656_Rotes_Labyrinth.jpg"
