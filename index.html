@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cosaha — Gallery</title>
+    <title>Cosaha — Galerie</title>
     <link rel="icon" href="Icon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -74,7 +74,8 @@
       .logo-item{padding:0;border:0}
       .logo-icon{width:100%;height:100%;object-fit:cover;display:block}
       .headline-item h1{margin:0;font-size:var(--headline-size);text-align:left}
-      .headline-item{justify-content:flex-start;padding-left:0.75rem;border:0}
+      .headline-item{flex-direction:column;align-items:flex-start;justify-content:space-between;padding-left:0.75rem;border:0}
+      .headline-item .phi{margin:0;font-size:var(--ui-size);text-align:left}
       .text-item{border:0;display:flex;align-items:flex-end;padding-left:0.75rem;padding-right:0.75rem}
       .text-item .phi{margin:0;font-size:var(--ui-size);padding:0 0.5rem}
       .text-item .title{display:block}
@@ -91,7 +92,7 @@
       .text-item .title{font-weight:600;margin-bottom:0.25rem;font-size:var(--ui-size)}
       .text-item .meta{font-size:var(--ui-size);color:#6b6a66}
       /* single philosophy cell (one tile) */
-      .philosophy-item{background:#fff;border:0;overflow:hidden;display:flex;align-items:center;justify-content:flex-start;padding:0.75rem;aspect-ratio:1/1}
+      .philosophy-item{background:#fff;border:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:flex-start;padding:0.75rem;aspect-ratio:1/1}
       .philosophy-item .phi{font-size:var(--ui-size);text-align:left;margin:0}
       /* controls inside a tile */
       .controls-item{position:relative;background:#fff;border:0;display:flex;align-items:center;justify-content:center;padding:0.5rem;aspect-ratio:1/1}
@@ -135,9 +136,14 @@
          4rem is a fallback for the instant before JS measures the bar's
          actual height in renderSelectionBar() */
       #bottom-spacer{height:4rem}
+      #request-availability-btn .label-short{display:none}
       @media (max-width:32.5rem){
         h1{font-size:1.375rem}
         .logo{height:4.5rem}
+        /* full label ("Request Availability"/"Verfügbarkeit anfragen")
+           overflows the bar on narrow screens — swap to the short one */
+        #request-availability-btn .label-full{display:none}
+        #request-availability-btn .label-short{display:inline}
       }
     </style>
   </head>
@@ -152,8 +158,8 @@
           <option value="christmas">Christmas</option>
         </select>
         <div class="lang-switch" id="lang-switch">
-          <button type="button" class="lang-btn active" data-lang="en">EN</button>
-          <button type="button" class="lang-btn" data-lang="de">DE</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
+          <button type="button" class="lang-btn active" data-lang="de">DE</button>
         </div>
       </div>
 
@@ -186,7 +192,7 @@
       // proper names. The Impressum/Datenschutzerklärung text also stays
       // German-only in both languages (it's a German legal document; an
       // informal translation of legal text isn't something to auto-generate).
-      let currentLang = 'en';
+      let currentLang = 'de';
       const translations = {
         en: {
           title: 'Cosaha — Gallery',
@@ -196,10 +202,12 @@
           sortTitle: 'Title',
           sortChristmas: 'Christmas',
           headline: 'Bring color into your home.',
-          intro: 'I love experimenting with colors, shapes, textures, and materials. For my monoprints I use natural materials like leaves and grasses as well as everyday objects. Each work is unique and fits the square frame of the Gelli Plate.',
+          introWelcome: 'I love experimenting with colors, shapes, textures, and materials.',
+          introDetails: 'For my monoprints I use natural materials like leaves and grasses as well as everyday objects. Each work is unique and fits the square frame of the Gelli Plate.',
           reachOut: 'Reach out!',
           selectionBarLabel: 'Selected Artworks:',
           requestAvailability: 'Request Availability',
+          requestAvailabilityShort: 'Request',
           impressum: 'Impressum',
           prevAria: 'Previous',
           nextAria: 'Next',
@@ -218,10 +226,12 @@
           sortTitle: 'Titel',
           sortChristmas: 'Weihnachten',
           headline: 'Bring Farbe in \ndein Zuhause.',
-          intro: 'Ich liebe das Experimentieren mit Farben, Formen, Texturen und Materialien. Für meine Monoprints verwende ich Naturmaterialien wie Blätter und Gräser sowie Alltagsgegenstände. Jedes Werk ist ein Unikat und passt in den quadratischen Rahmen der Gelli Plate.',
+          introWelcome: 'Willkommen auf meiner Seite der farbenfrohe Wandkunst in Form von handgefertigten Drucken mit Acrylfarbe auf Papier, sogenannte Gelprints. Sie sind nicht wiederholbar und somit ist jedes Stück ein Unikat.',
+          introDetails: 'Ich liebe es, mit Farben, Formen, Texturen und Materialien zu experimentieren. So verwende ich für die Gestaltung meiner Monoprints natürliche Materialien wie Blätter und Gräser, aber auch Alltagsgegenstände aller Art bis hin zu leeren Verpackungsmaterialien.\nDiese Bandbreite macht die Ergebnisse so vielfältig und individuell. Die einzige Konstante ist die Gelli Plate selbst mit ihrer quadratischen Form von 15 x 15 cm. Viel Spaß beim Stöbern!',
           reachOut: 'Melde dich!',
           selectionBarLabel: 'Ausgewählte Kunstwerke:',
           requestAvailability: 'Verfügbarkeit anfragen',
+          requestAvailabilityShort: 'Anfrage',
           impressum: 'Impressum',
           prevAria: 'Zurück',
           nextAria: 'Weiter',
@@ -415,6 +425,7 @@
       function setLang(lang){
         if(lang === currentLang) return;
         currentLang = lang;
+        document.documentElement.lang = lang;
         document.title = t('title');
         document.querySelectorAll('.lang-btn').forEach(b=>{
           b.classList.toggle('active', b.dataset.lang === lang);
@@ -603,7 +614,11 @@
           const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
           bar.querySelector('.selection-bar-label').textContent = t('selectionBarLabel');
           bar.querySelector('.selection-bar-names').textContent = chosen.map(it=>it.title).join(', ');
-          document.getElementById('request-availability-btn').textContent = t('requestAvailability');
+          // two labels, swapped by a media query — the full label overflows
+          // the bar on narrow/mobile screens
+          document.getElementById('request-availability-btn').innerHTML =
+            '<span class="label-full">' + t('requestAvailability') + '</span>' +
+            '<span class="label-short">' + t('requestAvailabilityShort') + '</span>';
           // size the spacer (and the modal's reserved bottom space) to the
           // bar's real height rather than hardcode it — a hardcoded value
           // silently went stale the last time the bar's content changed
@@ -837,6 +852,22 @@
         return a;
       }
 
+      // splits text on explicit '\n' paragraph breaks (not every sentence)
+      // and inserts a blank line (double <br>) only at those points —
+      // shared by the headline welcome blurb and the philosophy cell's
+      // details text
+      function appendParagraphs(container, text){
+        const paragraphs = text.split('\n');
+        paragraphs.forEach((p, i) => {
+          const txt = p.trim();
+          if (!txt) return;
+          container.appendChild(document.createTextNode(txt));
+          if (i < paragraphs.length - 1) {
+            container.appendChild(document.createElement('br'));
+            container.appendChild(document.createElement('br'));
+          }
+        });
+      }
 
       function render(){
         const mode = sortSelect.value;
@@ -895,7 +926,8 @@
         logoWrap.appendChild(logoImg);
         topRow.appendChild(logoWrap);
 
-        // insert headline as its own top-row cell
+        // insert headline as its own top-row cell, with the welcome blurb
+        // stacked below it
         const headWrap = document.createElement('div');
         headWrap.className = 'headline-item';
         const h = document.createElement('h1');
@@ -906,24 +938,16 @@
           if (i < headlineParts.length - 1) h.appendChild(document.createElement('br'));
         });
         headWrap.appendChild(h);
+        const welcomeP = document.createElement('p'); welcomeP.className = 'phi';
+        appendParagraphs(welcomeP, t('introWelcome'));
+        headWrap.appendChild(welcomeP);
         topRow.appendChild(headWrap);
 
         // insert single philosophy cell (one top-row tile)
         const phWrap = document.createElement('div');
         phWrap.className = 'philosophy-item';
         const php = document.createElement('p'); php.className = 'phi';
-        // split into sentences and insert blank lines (double <br>) between sentences
-        const introText = t('intro');
-        const sentences = introText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [introText];
-        sentences.forEach((s, i) => {
-          const txt = s.trim();
-          if (!txt) return;
-          php.appendChild(document.createTextNode(txt));
-          if (i < sentences.length - 1) {
-            php.appendChild(document.createElement('br'));
-            php.appendChild(document.createElement('br'));
-          }
-        });
+        appendParagraphs(php, t('introDetails'));
         phWrap.appendChild(php);
         topRow.appendChild(phWrap);
 
