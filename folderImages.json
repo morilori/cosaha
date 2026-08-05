@@ -1,18 +1,24 @@
 {
+  "Art/2-bewegtes Rot/": [
+    "Art/2-bewegtes%20Rot/20251116_181608.jpg",
+    "Art/2-bewegtes%20Rot/2_20251101_092242.jpg",
+    "Art/2-bewegtes%20Rot/2_20251101_092242_2.jpg",
+    "Art/2-bewegtes%20Rot/2_20251101_095328.jpg",
+    "Art/2-bewegtes%20Rot/2_20251101_095328_2.jpg",
+    "Art/2-bewegtes%20Rot/2_20251101_104027.jpg",
+    "Art/2-bewegtes%20Rot/2_main.jpg"
+  ],
+  "Art/24-abstraktes Orange/": [
+    "Art/24-abstraktes%20Orange/20251114_142621.jpg",
+    "Art/24-abstraktes%20Orange/20251114_143151.jpg",
+    "Art/24-abstraktes%20Orange/20251114_143454.jpg",
+    "Art/24-abstraktes%20Orange/24_main.jpg"
+  ],
   "Art/72-Sommerfarn/": [
     "Art/72-Sommerfarn/72_20260514_165528_Sommerfarn.jpg"
   ],
   "Art/44-Himmelswirbel/": [
     "Art/44-Himmelswirbel/44_20260321_114136_Himmelswirbel.jpg"
-  ],
-  "Art/3/": [
-    "Art/3/3_20251101_091432.jpg",
-    "Art/3/3_20251101_091432_2.jpg",
-    "Art/3/3_20251101_100133.jpg",
-    "Art/3/3_20251101_100133_2.jpg",
-    "Art/3/3_20251101_102647.jpg",
-    "Art/3/3_20251101_102647_2.jpg",
-    "Art/3/3_main.jpg"
   ],
   "Art/20-Farbenfrohes Blättermeer/": [
     "Art/20-Farbenfrohes%20Bl%C3%A4ttermeer/20251109_113758.jpg",
@@ -27,20 +33,20 @@
   "Art/54-Auf und Ab/": [
     "Art/54-Auf%20und%20Ab/54_20260415_172931_Auf_und_Ab.jpg"
   ],
-  "Art/24-e-v/": [
-    "Art/24-e-v/20251114_142621.jpg",
-    "Art/24-e-v/20251114_143151.jpg",
-    "Art/24-e-v/20251114_143454.jpg",
-    "Art/24-e-v/24_main.jpg"
+  "Art/10-Himmelstropfen/": [
+    "Art/10-Himmelstropfen/10_20251101_092653.jpg",
+    "Art/10-Himmelstropfen/10_20251101_092653_2.jpg",
+    "Art/10-Himmelstropfen/10_20251101_093745.jpg",
+    "Art/10-Himmelstropfen/10_20251101_093745_2.jpg",
+    "Art/10-Himmelstropfen/10_20251101_094134.jpg",
+    "Art/10-Himmelstropfen/10_20251101_094134_2.jpg",
+    "Art/10-Himmelstropfen/10_20251101_103106.jpg",
+    "Art/10-Himmelstropfen/10_20251101_103106_2.jpg",
+    "Art/10-Himmelstropfen/10_main.jpg",
+    "Art/10-Himmelstropfen/Screenshot_20251119_210619_Perplexity.jpg"
   ],
   "Art/66-Herbstwind/": [
     "Art/66-Herbstwind/66_20260509_144846.jpg"
-  ],
-  "Art/13/": [
-    "Art/13/13_20251101_110901.jpg",
-    "Art/13/13_20251101_111258.jpg",
-    "Art/13/13_20251101_111520.jpg",
-    "Art/13/13_main.jpg"
   ],
   "Art/63-Blumenwiese 4/": [
     "Art/63-Blumenwiese%204/63_20260503_143603_Blumenwiese_4.jpg"
@@ -48,44 +54,50 @@
   "Art/83-Eisblume/": [
     "Art/83-Eisblume/83_20260802_162038_Eisblume.jpg"
   ],
-  "Art/12-e-umrahmtes Lichtspiel/": [
-    "Art/12-e-umrahmtes%20Lichtspiel/12_20251101_093459.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/12_20251101_093459_2.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/12_20251101_094501.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/12_20251101_104250.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/12_20251101_104250_2.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/12_main.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/20251104_123555.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/20251104_123555_2.jpg",
-    "Art/12-e-umrahmtes%20Lichtspiel/Screenshot_20251119_210321_Perplexity.jpg"
+  "Art/9-Twins Blau/": [
+    "Art/9-Twins%20Blau/9.1_20250812_195709.jpg",
+    "Art/9-Twins%20Blau/9.1_20251101_092504.jpg",
+    "Art/9-Twins%20Blau/9.1_20251101_093542.jpg",
+    "Art/9-Twins%20Blau/9.1_20251101_103301.jpg",
+    "Art/9-Twins%20Blau/9.2_20250812_195850.jpg",
+    "Art/9-Twins%20Blau/9.2_20251101_092557.jpg",
+    "Art/9-Twins%20Blau/9.2_20251101_093628.jpg",
+    "Art/9-Twins%20Blau/9.2_20251101_094251.jpg",
+    "Art/9-Twins%20Blau/9.2_20251101_103013.jpg",
+    "Art/9-Twins%20Blau/9_20251101_105244.jpg",
+    "Art/9-Twins%20Blau/9_20251101_105311.jpg",
+    "Art/9-Twins%20Blau/9_main.jpg"
   ],
   "Art/51-Gedankennebel/": [
     "Art/51-Gedankennebel/51_20260411_110020_Gedankennebel.jpg"
   ],
+  "Art/8-Twins Orange/": [
+    "Art/8-Twins%20Orange/8.1_20250713_160050%20%281%29.jpg",
+    "Art/8-Twins%20Orange/8.1_20251101_092026.jpg",
+    "Art/8-Twins%20Orange/8.1_20251101_095638.jpg",
+    "Art/8-Twins%20Orange/8.1_20251101_104410.jpg",
+    "Art/8-Twins%20Orange/8.2_20250713_160101.jpg",
+    "Art/8-Twins%20Orange/8.2_20251101_092125.jpg",
+    "Art/8-Twins%20Orange/8.2_20251101_095513.jpg",
+    "Art/8-Twins%20Orange/8.2_20251101_104549.jpg",
+    "Art/8-Twins%20Orange/8_20251101_105416.jpg",
+    "Art/8-Twins%20Orange/8_main.jpg"
+  ],
+  "Art/11-Schichtenweise/": [
+    "Art/11-Schichtenweise/11_20251101_093346.jpg",
+    "Art/11-Schichtenweise/11_20251101_094743.jpg",
+    "Art/11-Schichtenweise/11_20251101_103430.jpg",
+    "Art/11-Schichtenweise/11_main.jpg",
+    "Art/11-Schichtenweise/20251104_123732.jpg"
+  ],
   "Art/75-Verwirrung/": [
     "Art/75-Verwirrung/75_20260514_165941_Verwirrung.jpg"
-  ],
-  "Art/7-e-goldene Blattpoesie/": [
-    "Art/7-e-goldene%20Blattpoesie/7_20251101_091927.jpg",
-    "Art/7-e-goldene%20Blattpoesie/7_20251101_091927_2.jpg",
-    "Art/7-e-goldene%20Blattpoesie/7_20251101_095805.jpg",
-    "Art/7-e-goldene%20Blattpoesie/7_20251101_095805_2.jpg",
-    "Art/7-e-goldene%20Blattpoesie/7_20251101_103908.jpg",
-    "Art/7-e-goldene%20Blattpoesie/7_20251101_103908_2.jpg",
-    "Art/7-e-goldene%20Blattpoesie/7_main.jpg",
-    "Art/7-e-goldene%20Blattpoesie/Screenshot_20251119_210818_Perplexity.jpg"
   ],
   "Art/47-Unterwasserwelt 1/": [
     "Art/47-Unterwasserwelt%201/47_20260402_103243_Unterwasserwelt_1.jpg"
   ],
   "Art/79-Aus∕fbruch/": [
     "Art/79-Aus%E2%88%95fbruch/79_20260621_124125.jpg"
-  ],
-  "Art/26_weihnachtliches Baumgeflüster/": [
-    "Art/26_weihnachtliches%20Baumgefl%C3%BCster/20251119_154956.jpg",
-    "Art/26_weihnachtliches%20Baumgefl%C3%BCster/20251119_155723.jpg",
-    "Art/26_weihnachtliches%20Baumgefl%C3%BCster/26_main.jpg",
-    "Art/26_weihnachtliches%20Baumgefl%C3%BCster/Screenshot_20251119_203038_Perplexity.jpg"
   ],
   "Art/30-Weihnachtsgedanken/": [
     "Art/30-Weihnachtsgedanken/20251128_151131.jpg",
@@ -98,12 +110,16 @@
   "Art/53-Geteilt/": [
     "Art/53-Geteilt/53_20260415_172852.jpg"
   ],
-  "Art/11/": [
-    "Art/11/11_20251101_093346.jpg",
-    "Art/11/11_20251101_094743.jpg",
-    "Art/11/11_20251101_103430.jpg",
-    "Art/11/11_main.jpg",
-    "Art/11/20251104_123732.jpg"
+  "Art/1-Frühlingswogen/": [
+    "Art/1-Fr%C3%BChlingswogen/1_20251031_114315.jpg",
+    "Art/1-Fr%C3%BChlingswogen/1_20251031_114315_2.jpg",
+    "Art/1-Fr%C3%BChlingswogen/1_20251101_093236.jpg",
+    "Art/1-Fr%C3%BChlingswogen/1_20251101_093236_2.jpg",
+    "Art/1-Fr%C3%BChlingswogen/1_20251101_094614.jpg",
+    "Art/1-Fr%C3%BChlingswogen/1_20251101_102857.jpg",
+    "Art/1-Fr%C3%BChlingswogen/1_20251101_102857_2.jpg",
+    "Art/1-Fr%C3%BChlingswogen/1_main.jpg",
+    "Art/1-Fr%C3%BChlingswogen/Screenshot_20251119_211601_Perplexity.jpg"
   ],
   "Art/65-Gedankenverästelung/": [
     "Art/65-Gedankenver%C3%A4stelung/65_20260509_144728_Gedankenver%C3%A4stelung.jpg"
@@ -119,26 +135,34 @@
   "Art/61-Blumenwiese 2/": [
     "Art/61-Blumenwiese%202/61_20260502_141017_Blumenwiese_2.jpg"
   ],
+  "Art/12-umrahmtes Lichtspiel/": [
+    "Art/12-umrahmtes%20Lichtspiel/12_20251101_093459.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/12_20251101_093459_2.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/12_20251101_094501.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/12_20251101_104250.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/12_20251101_104250_2.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/12_main.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/20251104_123555.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/20251104_123555_2.jpg",
+    "Art/12-umrahmtes%20Lichtspiel/Screenshot_20251119_210321_Perplexity.jpg"
+  ],
   "Art/73-Wassergras/": [
     "Art/73-Wassergras/73_20260514_165632_Wassergras.jpg"
   ],
   "Art/45-Springtime/": [
     "Art/45-Springtime/45_20260327_200507_Springtime.jpg"
   ],
+  "Art/19-Herbstgeflüster/": [
+    "Art/19-Herbstgefl%C3%BCster/19_main.jpg",
+    "Art/19-Herbstgefl%C3%BCster/20251104_124021.jpg",
+    "Art/19-Herbstgefl%C3%BCster/20251104_141311.jpg",
+    "Art/19-Herbstgefl%C3%BCster/20251104_141311_2.jpg",
+    "Art/19-Herbstgefl%C3%BCster/20251104_145158.jpg"
+  ],
   "Art/29-Tannenreigen/": [
     "Art/29-Tannenreigen/20251128_151114.jpg",
     "Art/29-Tannenreigen/20251128_152222.jpg",
     "Art/29-Tannenreigen/29_main.jpg"
-  ],
-  "Art/6-e-Sonnenstrahlen auf Holz/": [
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/6_20251101_091826.jpg",
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/6_20251101_091826_2.jpg",
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/6_20251101_095947.jpg",
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/6_20251101_095947_2.jpg",
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/6_20251101_103741.jpg",
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/6_20251101_103741_2.jpg",
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/6_main.jpg",
-    "Art/6-e-Sonnenstrahlen%20auf%20Holz/Screenshot_20251119_211136_Perplexity.jpg"
   ],
   "Art/58-Kraft der Natur 2/": [
     "Art/58-Kraft%20der%20Natur%202/58_20260426_103801.jpg"
@@ -148,18 +172,6 @@
   ],
   "Art/80-Gefrierzone/": [
     "Art/80-Gefrierzone/80_20260627_113149_Gefrierzone.jpg"
-  ],
-  "Art/19-e-v/": [
-    "Art/19-e-v/19_main.jpg",
-    "Art/19-e-v/20251104_124021.jpg",
-    "Art/19-e-v/20251104_141311.jpg",
-    "Art/19-e-v/20251104_141311_2.jpg",
-    "Art/19-e-v/20251104_145158.jpg"
-  ],
-  "Art/25_goldener Weihnachtsduft/": [
-    "Art/25_goldener%20Weihnachtsduft/20251119_154827.jpg",
-    "Art/25_goldener%20Weihnachtsduft/20251119_155546.jpg",
-    "Art/25_goldener%20Weihnachtsduft/25_main.jpg"
   ],
   "Art/Frame/": [
     "Art/Frame/frame_back.jpg",
@@ -204,20 +216,20 @@
   "Art/48-Frühlingswind/": [
     "Art/48-Fr%C3%BChlingswind/48_20260402_140948.jpg"
   ],
-  "Art/2/": [
-    "Art/2/20251116_181608.jpg",
-    "Art/2/2_20251101_092242.jpg",
-    "Art/2/2_20251101_092242_2.jpg",
-    "Art/2/2_20251101_095328.jpg",
-    "Art/2/2_20251101_095328_2.jpg",
-    "Art/2/2_20251101_104027.jpg",
-    "Art/2/2_main.jpg"
-  ],
   "Art/77-Himmelstraum/": [
     "Art/77-Himmelstraum/77_20260514_180025_Himmelstraum.jpg"
   ],
   "Art/76-Gedankengänge/": [
     "Art/76-Gedankeng%C3%A4nge/76_20260514_180010_Gedankeng%C3%A4nge.jpg"
+  ],
+  "Art/18-Herbstspuren im Sonnenlicht/": [
+    "Art/18-Herbstspuren%20im%20Sonnenlicht/18_main.jpg",
+    "Art/18-Herbstspuren%20im%20Sonnenlicht/20251104_123916.jpg",
+    "Art/18-Herbstspuren%20im%20Sonnenlicht/20251104_123916_2.jpg",
+    "Art/18-Herbstspuren%20im%20Sonnenlicht/20251104_141241.jpg",
+    "Art/18-Herbstspuren%20im%20Sonnenlicht/20251104_141241_2.jpg",
+    "Art/18-Herbstspuren%20im%20Sonnenlicht/20251104_145037.jpg",
+    "Art/18-Herbstspuren%20im%20Sonnenlicht/20251104_145037_2.jpg"
   ],
   "Art/59-Kraft der Natur/": [
     "Art/59-Kraft%20der%20Natur/59_20260426_121723_Kraft_der_Natur.jpg"
@@ -227,17 +239,6 @@
   ],
   "Art/67-Morgensonne/": [
     "Art/67-Morgensonne/67_20260509_144953.jpg"
-  ],
-  "Art/1-e-Frühlingswogen/": [
-    "Art/1-e-Fr%C3%BChlingswogen/1_20251031_114315.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/1_20251031_114315_2.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/1_20251101_093236.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/1_20251101_093236_2.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/1_20251101_094614.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/1_20251101_102857.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/1_20251101_102857_2.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/1_main.jpg",
-    "Art/1-e-Fr%C3%BChlingswogen/Screenshot_20251119_211601_Perplexity.jpg"
   ],
   "Art/Twins blau/": [
     "Art/Twins%20blau/20250812_195709.jpg",
@@ -268,50 +269,38 @@
   "Art/68-Sturmwind/": [
     "Art/68-Sturmwind/68_20260509_145051_Sturmwind.jpg"
   ],
+  "Art/5-Wasserwelten/": [
+    "Art/5-Wasserwelten/5_20251101_091727.jpg",
+    "Art/5-Wasserwelten/5_20251101_094956.jpg",
+    "Art/5-Wasserwelten/5_20251101_103601.jpg",
+    "Art/5-Wasserwelten/5_main.jpg"
+  ],
   "Art/74-Feuergras/": [
     "Art/74-Feuergras/74_20260514_165740_Feuergras.jpg"
-  ],
-  "Art/8/": [
-    "Art/8/8.1_20250713_160050%20%281%29.jpg",
-    "Art/8/8.1_20251101_092026.jpg",
-    "Art/8/8.1_20251101_095638.jpg",
-    "Art/8/8.1_20251101_104410.jpg",
-    "Art/8/8.2_20250713_160101.jpg",
-    "Art/8/8.2_20251101_092125.jpg",
-    "Art/8/8.2_20251101_095513.jpg",
-    "Art/8/8.2_20251101_104549.jpg",
-    "Art/8/8_20251101_105416.jpg",
-    "Art/8/8_main.jpg"
   ],
   "Art/46-Unterwasserwelt 2/": [
     "Art/46-Unterwasserwelt%202/46_20260402_103057_Unterwasserwelt_2.jpg"
   ],
-  "Art/10-e-Himmelstropfen/": [
-    "Art/10-e-Himmelstropfen/10_20251101_092653.jpg",
-    "Art/10-e-Himmelstropfen/10_20251101_092653_2.jpg",
-    "Art/10-e-Himmelstropfen/10_20251101_093745.jpg",
-    "Art/10-e-Himmelstropfen/10_20251101_093745_2.jpg",
-    "Art/10-e-Himmelstropfen/10_20251101_094134.jpg",
-    "Art/10-e-Himmelstropfen/10_20251101_094134_2.jpg",
-    "Art/10-e-Himmelstropfen/10_20251101_103106.jpg",
-    "Art/10-e-Himmelstropfen/10_20251101_103106_2.jpg",
-    "Art/10-e-Himmelstropfen/10_main.jpg",
-    "Art/10-e-Himmelstropfen/Screenshot_20251119_210619_Perplexity.jpg"
+  "Art/25-goldener Weihnachtsduft/": [
+    "Art/25-goldener%20Weihnachtsduft/20251119_154827.jpg",
+    "Art/25-goldener%20Weihnachtsduft/20251119_155546.jpg",
+    "Art/25-goldener%20Weihnachtsduft/25_main.jpg"
   ],
-  "Art/5/": [
-    "Art/5/5_20251101_091727.jpg",
-    "Art/5/5_20251101_094956.jpg",
-    "Art/5/5_20251101_103601.jpg",
-    "Art/5/5_main.jpg"
+  "Art/16-zwischen Chaos und Klarheit/": [
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/16_20251102_102900.jpg",
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/16_20251102_102900_2.jpg",
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/16_20251102_103458.jpg",
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/16_20251102_103458_2.jpg",
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/16_20251102_104158.jpg",
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/16_20251102_104158_2.jpg",
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/16_main.jpg",
+    "Art/16-zwischen%20Chaos%20und%20Klarheit/Screenshot_20251119_205047_Perplexity.jpg"
   ],
-  "Art/18-e-Herbstspuren im Sonnenlicht/": [
-    "Art/18-e-Herbstspuren%20im%20Sonnenlicht/18_main.jpg",
-    "Art/18-e-Herbstspuren%20im%20Sonnenlicht/20251104_123916.jpg",
-    "Art/18-e-Herbstspuren%20im%20Sonnenlicht/20251104_123916_2.jpg",
-    "Art/18-e-Herbstspuren%20im%20Sonnenlicht/20251104_141241.jpg",
-    "Art/18-e-Herbstspuren%20im%20Sonnenlicht/20251104_141241_2.jpg",
-    "Art/18-e-Herbstspuren%20im%20Sonnenlicht/20251104_145037.jpg",
-    "Art/18-e-Herbstspuren%20im%20Sonnenlicht/20251104_145037_2.jpg"
+  "Art/14-flüchtige Gedanken/": [
+    "Art/14-fl%C3%BCchtige%20Gedanken/14_20251102_101212.jpg",
+    "Art/14-fl%C3%BCchtige%20Gedanken/14_20251102_101507.jpg",
+    "Art/14-fl%C3%BCchtige%20Gedanken/14_20251102_101940.jpg",
+    "Art/14-fl%C3%BCchtige%20Gedanken/14_main.jpg"
   ],
   "Art/34-rote Weihnacht 2/": [
     "Art/34-rote%20Weihnacht%202/20251206_111849.jpg",
@@ -323,53 +312,73 @@
     "Art/31-rote%20Weihnacht%201/20251128_152406.jpg",
     "Art/31-rote%20Weihnacht%201/31_main.jpg"
   ],
+  "Art/7-goldene Blattpoesie/": [
+    "Art/7-goldene%20Blattpoesie/7_20251101_091927.jpg",
+    "Art/7-goldene%20Blattpoesie/7_20251101_091927_2.jpg",
+    "Art/7-goldene%20Blattpoesie/7_20251101_095805.jpg",
+    "Art/7-goldene%20Blattpoesie/7_20251101_095805_2.jpg",
+    "Art/7-goldene%20Blattpoesie/7_20251101_103908.jpg",
+    "Art/7-goldene%20Blattpoesie/7_20251101_103908_2.jpg",
+    "Art/7-goldene%20Blattpoesie/7_main.jpg",
+    "Art/7-goldene%20Blattpoesie/Screenshot_20251119_210818_Perplexity.jpg"
+  ],
   "Art/62-Blumenwiese 3/": [
     "Art/62-Blumenwiese%203/62_20260503_143501_Blumenwiese_3.jpg"
   ],
+  "Art/3-Auftrieb/": [
+    "Art/3-Auftrieb/3_20251101_091432.jpg",
+    "Art/3-Auftrieb/3_20251101_091432_2.jpg",
+    "Art/3-Auftrieb/3_20251101_100133.jpg",
+    "Art/3-Auftrieb/3_20251101_100133_2.jpg",
+    "Art/3-Auftrieb/3_20251101_102647.jpg",
+    "Art/3-Auftrieb/3_20251101_102647_2.jpg",
+    "Art/3-Auftrieb/3_main.jpg"
+  ],
+  "Art/22-Farbtanz im Wind/": [
+    "Art/22-Farbtanz%20im%20Wind/20251109_105404.jpg",
+    "Art/22-Farbtanz%20im%20Wind/20251109_105404_2.jpg",
+    "Art/22-Farbtanz%20im%20Wind/20251109_114018.jpg",
+    "Art/22-Farbtanz%20im%20Wind/20251109_114018_2.jpg",
+    "Art/22-Farbtanz%20im%20Wind/20251109_115307.jpg",
+    "Art/22-Farbtanz%20im%20Wind/20251109_115307_2.jpg",
+    "Art/22-Farbtanz%20im%20Wind/22_main.jpg"
+  ],
   "Art/57-Kraft der Natur 3/": [
     "Art/57-Kraft%20der%20Natur%203/57_20260426_103643.jpg"
-  ],
-  "Art/4-e-Blattgeflüster in Türkis/": [
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_091621.jpg",
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_091621_2.jpg",
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_095116.jpg",
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_095116_2.jpg",
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_102935.jpg",
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_102935_2.jpg",
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_main.jpg",
-    "Art/4-e-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/Screenshot_20251119_211317_Perplexity.jpg"
-  ],
-  "Art/16-e-zwischen Chaos und Klarheit/": [
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/16_20251102_102900.jpg",
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/16_20251102_102900_2.jpg",
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/16_20251102_103458.jpg",
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/16_20251102_103458_2.jpg",
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/16_20251102_104158.jpg",
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/16_20251102_104158_2.jpg",
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/16_main.jpg",
-    "Art/16-e-zwischen%20Chaos%20und%20Klarheit/Screenshot_20251119_205047_Perplexity.jpg"
   ],
   "Art/33-Sommer am See/": [
     "Art/33-Sommer%20am%20See/20251128_151219.jpg",
     "Art/33-Sommer%20am%20See/20251128_152602.jpg",
     "Art/33-Sommer%20am%20See/33_main.jpg"
   ],
+  "Art/4-Blattgeflüster in Türkis/": [
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_091621.jpg",
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_091621_2.jpg",
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_095116.jpg",
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_095116_2.jpg",
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_102935.jpg",
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_20251101_102935_2.jpg",
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/4_main.jpg",
+    "Art/4-Blattgefl%C3%BCster%20in%20T%C3%BCrkis/Screenshot_20251119_211317_Perplexity.jpg"
+  ],
   "Art/50-Herbstregen/": [
     "Art/50-Herbstregen/50_20260411_095557_Herbstregen.jpg"
   ],
-  "Art/9/": [
-    "Art/9/9.1_20250812_195709.jpg",
-    "Art/9/9.1_20251101_092504.jpg",
-    "Art/9/9.1_20251101_093542.jpg",
-    "Art/9/9.1_20251101_103301.jpg",
-    "Art/9/9.2_20250812_195850.jpg",
-    "Art/9/9.2_20251101_092557.jpg",
-    "Art/9/9.2_20251101_093628.jpg",
-    "Art/9/9.2_20251101_094251.jpg",
-    "Art/9/9.2_20251101_103013.jpg",
-    "Art/9/9_20251101_105244.jpg",
-    "Art/9/9_20251101_105311.jpg",
-    "Art/9/9_main.jpg"
+  "Art/26-weihnachtliches Baumgeflüster/": [
+    "Art/26-weihnachtliches%20Baumgefl%C3%BCster/20251119_154956.jpg",
+    "Art/26-weihnachtliches%20Baumgefl%C3%BCster/20251119_155723.jpg",
+    "Art/26-weihnachtliches%20Baumgefl%C3%BCster/26_main.jpg",
+    "Art/26-weihnachtliches%20Baumgefl%C3%BCster/Screenshot_20251119_203038_Perplexity.jpg"
+  ],
+  "Art/6-Sonnenstrahlen auf Holz/": [
+    "Art/6-Sonnenstrahlen%20auf%20Holz/6_20251101_091826.jpg",
+    "Art/6-Sonnenstrahlen%20auf%20Holz/6_20251101_091826_2.jpg",
+    "Art/6-Sonnenstrahlen%20auf%20Holz/6_20251101_095947.jpg",
+    "Art/6-Sonnenstrahlen%20auf%20Holz/6_20251101_095947_2.jpg",
+    "Art/6-Sonnenstrahlen%20auf%20Holz/6_20251101_103741.jpg",
+    "Art/6-Sonnenstrahlen%20auf%20Holz/6_20251101_103741_2.jpg",
+    "Art/6-Sonnenstrahlen%20auf%20Holz/6_main.jpg",
+    "Art/6-Sonnenstrahlen%20auf%20Holz/Screenshot_20251119_211136_Perplexity.jpg"
   ],
   "Art/39-Strandgeister/": [
     "Art/39-Strandgeister/39_20260321_113547.jpg"
@@ -391,6 +400,12 @@
   "Art/82-Gedankenkreisel/": [
     "Art/82-Gedankenkreisel/82_20260705_152235_Gedankenkreisel.jpg"
   ],
+  "Art/13-Weidengeister/": [
+    "Art/13-Weidengeister/13_20251101_110901.jpg",
+    "Art/13-Weidengeister/13_20251101_111258.jpg",
+    "Art/13-Weidengeister/13_20251101_111520.jpg",
+    "Art/13-Weidengeister/13_main.jpg"
+  ],
   "Art/42-Zellteilung/": [
     "Art/42-Zellteilung/42_20260321_113837_Zellteilung.jpg"
   ],
@@ -404,12 +419,6 @@
   ],
   "Art/40-Sandgewusel/": [
     "Art/40-Sandgewusel/40_20260321_113635.jpg"
-  ],
-  "Art/14-e-v/": [
-    "Art/14-e-v/14_20251102_101212.jpg",
-    "Art/14-e-v/14_20251102_101507.jpg",
-    "Art/14-e-v/14_20251102_101940.jpg",
-    "Art/14-e-v/14_main.jpg"
   ],
   "Art/70-Gemeinschaft/": [
     "Art/70-Gemeinschaft/70_20260514_165305_Gemeinschaft.jpg"
@@ -433,15 +442,6 @@
     "Art/15-verwobene%20Erinnerung/15_20251102_104426.jpg",
     "Art/15-verwobene%20Erinnerung/15_main.jpg",
     "Art/15-verwobene%20Erinnerung/Screenshot_20251119_210026_Perplexity.jpg"
-  ],
-  "Art/22-e_Farbtanz im Wind/": [
-    "Art/22-e_Farbtanz%20im%20Wind/20251109_105404.jpg",
-    "Art/22-e_Farbtanz%20im%20Wind/20251109_105404_2.jpg",
-    "Art/22-e_Farbtanz%20im%20Wind/20251109_114018.jpg",
-    "Art/22-e_Farbtanz%20im%20Wind/20251109_114018_2.jpg",
-    "Art/22-e_Farbtanz%20im%20Wind/20251109_115307.jpg",
-    "Art/22-e_Farbtanz%20im%20Wind/20251109_115307_2.jpg",
-    "Art/22-e_Farbtanz%20im%20Wind/22_main.jpg"
   ],
   "Art/37-Rosenblätter/": [
     "Art/37-Rosenbl%C3%A4tter/37_20260220_103421_Rosenbl%C3%A4tter.jpg"
