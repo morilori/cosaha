@@ -459,9 +459,19 @@
 
       document.getElementById('request-availability-btn').addEventListener('click', composeInquiryMailto);
 
+      // folder names carry a "-<farbe>" suffix (see
+      // scripts/add_color_to_folder_names.py) for organization, but it
+      // shouldn't show up in the displayed title — only strip it when
+      // hyphen-joined (how that script always appends it); a handful of
+      // folders have a color word as a natural, space-joined part of their
+      // real title (e.g. "2-bewegtes Rot") and are deliberately left alone
+      const FOLDER_COLOR_SUFFIXES = ['rot','orange','gelb','limette','grün','petrol','cyan','blau','indigo','violett','magenta','karmesinrot'];
+      const FOLDER_COLOR_SUFFIX_RE = new RegExp('-(' + FOLDER_COLOR_SUFFIXES.join('|') + ')$', 'i');
+
       function titleFromPath(p){
         const part = p.split('/')[1]||p;
         return part
+          .replace(FOLDER_COLOR_SUFFIX_RE, '')
           .replace(/^\d+[-_]?/, '')
           .replace(/[-_]+/g, ' ')
           .replace(/\s+e\s+/, ' ')
