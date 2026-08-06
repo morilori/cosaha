@@ -58,6 +58,21 @@
       @media (max-width:32.5rem){
         .grid,.top-row,.bottom-row,.selected-row{grid-template-columns:repeat(1,minmax(12.5rem,1fr));}
       }
+      /* manual "zoom" override (mobile only) — lets a visitor see more,
+         smaller columns than the automatic breakpoint would give them.
+         No minmax floor here on purpose: the whole point is fitting more
+         columns into a narrow screen than 12.5rem/column would allow */
+      body.force-cols-2 .grid,body.force-cols-2 .top-row,body.force-cols-2 .bottom-row,body.force-cols-2 .selected-row{grid-template-columns:repeat(2,1fr)!important}
+      body.force-cols-4 .grid,body.force-cols-4 .top-row,body.force-cols-4 .bottom-row,body.force-cols-4 .selected-row{grid-template-columns:repeat(4,1fr)!important}
+      .mobile-top-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:95;background:#fff;border-bottom:0.0625rem solid #e7e3dc;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem}
+      @media (max-width:48rem){
+        .mobile-top-bar{display:flex}
+      }
+      .mobile-top-logo-btn{background:none;border:0;padding:0;margin:0;cursor:pointer;display:flex;align-items:center}
+      .mobile-top-logo-img{height:2rem;width:auto;display:block}
+      .zoom-switch{display:flex;border:0.0625rem solid #e7e3dc}
+      .zoom-btn{background:#fff;border:0;padding:0 0.6rem;height:var(--control-height);font-size:var(--ui-size);cursor:pointer;color:#595853;font-family:inherit}
+      .zoom-btn.active{background:var(--accent);color:#fff}
       /* match artwork cell appearance and force square aspect */
       .logo-item, .headline-item, .text-item{
         background:#fff;
@@ -153,6 +168,16 @@
     </style>
   </head>
   <body>
+    <div id="mobile-top-bar" class="mobile-top-bar">
+      <button type="button" id="scroll-top-btn" class="mobile-top-logo-btn" aria-label="Scroll to top">
+        <img src="Icon.svg" alt="Cosaha" class="mobile-top-logo-img">
+      </button>
+      <div class="zoom-switch" id="zoom-switch">
+        <button type="button" class="zoom-btn" data-cols="1">1</button>
+        <button type="button" class="zoom-btn" data-cols="2">2</button>
+        <button type="button" class="zoom-btn" data-cols="4">4</button>
+      </div>
+    </div>
     <div class="wrap">
       <div class="controls">
         <label for="sort-select">Sort by:</label>
@@ -217,6 +242,7 @@
           prevAria: 'Previous',
           nextAria: 'Next',
           markInterested: 'Mark as interested',
+          scrollTopAria: 'Scroll to top',
           mailGreeting: "Hi,\n\nI'm interested in the following artworks:\n- ",
           mailSubjectPrefix: 'Interest in artworks: ',
           mailSubjectGeneric: 'Website inquiry',
@@ -241,6 +267,7 @@
           prevAria: 'Zurück',
           nextAria: 'Weiter',
           markInterested: 'Als interessant markieren',
+          scrollTopAria: 'Nach oben scrollen',
           mailGreeting: 'Hallo,\n\nich interessiere mich für folgende Kunstwerke:\n- ',
           mailSubjectPrefix: 'Interesse an Kunstwerken: ',
           mailSubjectGeneric: 'Anfrage über die Website',
@@ -310,10 +337,19 @@
         }
       }).catch(()=>{ /* ignore if not present */ });
 
+      // null = automatic (CSS breakpoints decide column count); 1/2/4 =
+      // visitor has manually picked a "zoom" level via the mobile top bar
+      let mobileColumnOverride = null;
+
       // matches the .grid/.selected-row single-column breakpoint — used
       // instead of reading computed grid-template-columns so it still
-      // works for elements that are currently display:none (selected-row)
+      // works for elements that are currently display:none (selected-row).
+      // A manual zoom override always wins: forcing 2 or 4 columns turns
+      // off the single-column inline swipe/arrows (tiles are small again,
+      // so opening the lightbox is useful again), and forcing 1 turns it
+      // on even above the automatic breakpoint.
       function isSingleColumnViewport(){
+        if(mobileColumnOverride != null) return mobileColumnOverride === 1;
         return window.matchMedia('(max-width: 32.5rem)').matches;
       }
 
@@ -413,6 +449,7 @@
         if(btn) btn.textContent = sortOptionLabel(sortSelect.value);
         modalPrev.setAttribute('aria-label', t('prevAria'));
         modalNext.setAttribute('aria-label', t('nextAria'));
+        document.getElementById('scroll-top-btn').setAttribute('aria-label', t('scrollTopAria'));
       }
 
       function createCustomSelect(){
@@ -469,6 +506,26 @@
       });
 
       document.getElementById('request-availability-btn').addEventListener('click', composeInquiryMailto);
+
+      function setColumnOverride(cols){
+        mobileColumnOverride = cols;
+        document.body.classList.remove('force-cols-1','force-cols-2','force-cols-4');
+        document.body.classList.add('force-cols-' + cols);
+        document.querySelectorAll('.zoom-btn').forEach(b=>{
+          b.classList.toggle('active', Number(b.dataset.cols) === cols);
+        });
+        render();
+        renderSelectedRow();
+      }
+
+      document.getElementById('zoom-switch').addEventListener('click', (e)=>{
+        const btn = e.target.closest('.zoom-btn');
+        if(btn) setColumnOverride(Number(btn.dataset.cols));
+      });
+
+      document.getElementById('scroll-top-btn').addEventListener('click', ()=>{
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
 
       // folder names carry a "-<farbe>" suffix (see
       // scripts/add_color_to_folder_names.py) for organization, but it
@@ -838,10 +895,12 @@
             prevBtn.type = 'button'; prevBtn.className = 'cell-nav cell-nav-prev'; prevBtn.textContent = '◀';
             prevBtn.setAttribute('aria-label', t('prevAria'));
             prevBtn.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); showAt(pos - 1); });
+            prevBtn.addEventListener('dblclick', (e)=>e.stopPropagation());
             const nextBtn = document.createElement('button');
             nextBtn.type = 'button'; nextBtn.className = 'cell-nav cell-nav-next'; nextBtn.textContent = '▶';
             nextBtn.setAttribute('aria-label', t('nextAria'));
             nextBtn.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); showAt(pos + 1); });
+            nextBtn.addEventListener('dblclick', (e)=>e.stopPropagation());
             a.appendChild(prevBtn);
             a.appendChild(nextBtn);
 
@@ -855,7 +914,12 @@
               if(dx < 0) showAt(pos + 1); else showAt(pos - 1);
             }, { passive: true });
           }
-          // no click-to-enlarge in single-column mode — see comment above
+          // no click-to-enlarge in single-column mode — see comment above;
+          // double-tap likes the artwork instead, mirroring the lightbox
+          a.addEventListener('dblclick', (e)=>{
+            e.preventDefault();
+            toggleSelect(item);
+          });
         } else {
           a.addEventListener('click', ()=>{
             openModalFor(item.idx);
@@ -876,6 +940,7 @@
           e.stopPropagation();
           toggleSelect(item);
         });
+        selectBtn.addEventListener('dblclick', (e)=>e.stopPropagation());
         a.appendChild(selectBtn);
 
         return a;
@@ -1038,6 +1103,18 @@
 
       sortSelect.addEventListener('change', render);
 
+      // the mobile top bar is fixed and always-on-top (like the selection
+      // bar), so the lightbox needs matching top padding or the enlarged
+      // image would render underneath it; offsetHeight is naturally 0 when
+      // the bar's media query makes it display:none, so this needs no
+      // separate "are we on mobile" check of its own
+      function updateMobileTopBarSpacing(){
+        const bar = document.getElementById('mobile-top-bar');
+        const h = bar.offsetHeight + 'px';
+        modal.style.paddingTop = h;
+        document.body.style.paddingTop = h;
+      }
+
       // re-render on resize/rotation so crossing the single-column
       // breakpoint switches between the lightbox and inline swipe/arrows
       let resizeTimer = null;
@@ -1045,6 +1122,7 @@
       window.addEventListener('resize', ()=>{
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(()=>{
+          updateMobileTopBarSpacing();
           const nowSingleCol = isSingleColumnViewport();
           if(nowSingleCol !== lastSingleCol){
             lastSingleCol = nowSingleCol;
@@ -1055,10 +1133,12 @@
       });
 
       // Initial render
+      updateSortLabels();
       render();
       renderBottomRow();
       renderSelectedRow();
       renderSelectionBar();
+      updateMobileTopBarSpacing();
 
       modal.addEventListener('click', (e)=>{
         // close only when clicking the backdrop, not when clicking modal content or nav buttons
