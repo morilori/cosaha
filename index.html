@@ -109,6 +109,11 @@
       .select-btn{position:absolute;top:0.5rem;right:0.5rem;width:1.875rem;height:1.875rem;border-radius:50%;border:0;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;line-height:1;color:var(--accent);box-shadow:0 0.0625rem 0.25rem rgba(0,0,0,0.15)}
       .select-btn.selected{background:var(--accent);color:#fff}
       .select-btn:hover{box-shadow:0 0 0 4px rgba(195,78,78,0.12)}
+      /* single-column inline prev/next — replaces opening the lightbox,
+         since the thumbnail is already nearly full width there */
+      .cell-nav{position:absolute;top:50%;transform:translateY(-50%);background:transparent;border:0;color:#fff;font-size:1.125rem;line-height:1;padding:0.625rem 0.5rem;cursor:pointer;z-index:5}
+      .cell-nav-prev{left:0}
+      .cell-nav-next{right:0}
       /* padding-bottom fallback (matches #bottom-spacer's fallback) —
          reserves room so the enlarged image never sits under the always-
          on-top selection bar; kept in sync with the bar's real height by
@@ -294,33 +299,43 @@
         }
       }).catch(()=>{ /* ignore if not present */ });
 
-      function openModalFor(idx){
-        const src = items[idx].src;
+      // matches the .grid/.selected-row single-column breakpoint — used
+      // instead of reading computed grid-template-columns so it still
+      // works for elements that are currently display:none (selected-row)
+      function isSingleColumnViewport(){
+        return window.matchMedia('(max-width: 32.5rem)').matches;
+      }
+
+      // resolves every image in an item's artwork folder (for modal
+      // prev/next and the single-column inline swipe/arrows), and which
+      // position within that list the item's own src is at
+      function resolveFolderFiles(item){
+        const src = item.src;
         const folder = src.substring(0, src.lastIndexOf('/')) + '/';
-        // prefer using folderImages.json lists when available
+        const normSrc = (src && src.normalize) ? src.normalize('NFC') : src;
         if(folderImages[folder] && folderImages[folder].length){
-          modalFiles = folderImages[folder].slice();
-          // ensure normalized strings for reliable comparisons with deployed paths
-          modalFiles = modalFiles.map(s => (s && s.normalize) ? s.normalize('NFC') : s);
-          // ensure exact strings (items may use unencoded paths)
-          const normSrc = (src && src.normalize) ? src.normalize('NFC') : src;
-          modalPos = modalFiles.indexOf(normSrc);
-          if(modalPos === -1){
+          const files = folderImages[folder].slice().map(s => (s && s.normalize) ? s.normalize('NFC') : s);
+          let pos = files.indexOf(normSrc);
+          if(pos === -1){
             // try matching by decode/encode variants
-            const decodedFiles = modalFiles.map(p=>{ try { return decodeURIComponent(p).normalize('NFC'); } catch(e){ return p; } });
-            modalPos = decodedFiles.indexOf(normSrc);
-            if(modalPos === -1) modalPos = 0;
+            const decodedFiles = files.map(p=>{ try { return decodeURIComponent(p).normalize('NFC'); } catch(e){ return p; } });
+            pos = decodedFiles.indexOf(normSrc);
+            if(pos === -1) pos = 0;
           }
-          showModalAt(modalPos);
-          return;
+          return { files, pos };
         }
         // fallback: build group from items in same folder
-        const group = items.map((it, i) => ({i, src: it.src})).filter(x => x.src && x.src.startsWith(folder)).map(x => (x.src && x.src.normalize) ? x.src.normalize('NFC') : x.src);
-        modalFiles = group.length ? group : [ (src && src.normalize) ? src.normalize('NFC') : src ];
-        const normSrc2 = (src && src.normalize) ? src.normalize('NFC') : src;
-        modalPos = modalFiles.indexOf(normSrc2);
-        if(modalPos === -1) modalPos = 0;
-        showModalAt(modalPos);
+        const group = items.map(it=>it.src).filter(s => s && s.startsWith(folder)).map(s => (s && s.normalize) ? s.normalize('NFC') : s);
+        const files = group.length ? group : [normSrc];
+        let pos = files.indexOf(normSrc);
+        if(pos === -1) pos = 0;
+        return { files, pos };
+      }
+
+      function openModalFor(idx){
+        const { files, pos } = resolveFolderFiles(items[idx]);
+        modalFiles = files;
+        showModalAt(pos);
       }
 
       function showModalAt(pos){
@@ -600,8 +615,9 @@
           const bySrc = new Map(items.map(it=>[it.src, it]));
           const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
           selectedRow.style.display = chosen.length ? 'grid' : 'none';
+          const selectedSingleCol = isSingleColumnViewport();
           for(const it of chosen){
-            selectedRow.appendChild(cellFor(it));
+            selectedRow.appendChild(cellFor(it, selectedSingleCol));
           }
         }
 
@@ -803,7 +819,11 @@
       // build initial items from fallback list; this will be replaced if folderImages.json is present
       buildItems();
 
-      function cellFor(item){
+      // singleCol: in the one-column mobile layout, the enlarged lightbox
+      // adds little (the thumbnail is already nearly full width), so
+      // instead of opening it, show prev/next arrows on the thumbnail
+      // itself and let it be swiped between an artwork's photos in place
+      function cellFor(item, singleCol){
         const a = document.createElement('a');
         a.href = 'javascript:void(0)';
         a.className = 'cell';
@@ -829,9 +849,43 @@
           }
         }, { once: true });
         a.appendChild(img);
-        a.addEventListener('click', ()=>{
-          openModalFor(item.idx);
-        });
+
+        if(singleCol){
+          const { files, pos: startPos } = resolveFolderFiles(item);
+          if(files.length > 1){
+            let pos = startPos;
+            const showAt = (p) => {
+              pos = ((p % files.length) + files.length) % files.length;
+              const s = (files[pos] && files[pos].normalize) ? files[pos].normalize('NFC') : files[pos];
+              img.src = encodeURI(s);
+            };
+            const prevBtn = document.createElement('button');
+            prevBtn.type = 'button'; prevBtn.className = 'cell-nav cell-nav-prev'; prevBtn.textContent = '◀';
+            prevBtn.setAttribute('aria-label', t('prevAria'));
+            prevBtn.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); showAt(pos - 1); });
+            const nextBtn = document.createElement('button');
+            nextBtn.type = 'button'; nextBtn.className = 'cell-nav cell-nav-next'; nextBtn.textContent = '▶';
+            nextBtn.setAttribute('aria-label', t('nextAria'));
+            nextBtn.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); showAt(pos + 1); });
+            a.appendChild(prevBtn);
+            a.appendChild(nextBtn);
+
+            let touchStartX = null;
+            a.addEventListener('touchstart', (e)=>{ touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+            a.addEventListener('touchend', (e)=>{
+              if(touchStartX == null) return;
+              const dx = e.changedTouches[0].clientX - touchStartX;
+              touchStartX = null;
+              if(Math.abs(dx) < 30) return; // ignore small taps/jitter
+              if(dx < 0) showAt(pos + 1); else showAt(pos - 1);
+            }, { passive: true });
+          }
+          // no click-to-enlarge in single-column mode — see comment above
+        } else {
+          a.addEventListener('click', ()=>{
+            openModalFor(item.idx);
+          });
+        }
 
         const isSelected = selected.has(item.src);
         const selectBtn = document.createElement('button');
@@ -974,13 +1028,13 @@
         let rowIndex = Math.floor(preCount / computedCols);
         // single-column view: always artwork-then-text, top-left aligned,
         // instead of the normal alternating side-left/side-right layout
-        const singleCol = computedCols < 2;
+        const singleCol = isSingleColumnViewport();
         while (idx < pairs.length) {
           const rowSlice = pairs.slice(idx, idx + pairsPerRow);
           // start rows with the text cell (offset parity so text appears first)
           const artworkFirst = singleCol ? true : (rowIndex % 2 !== 0);
           for (const art of rowSlice) {
-            const artCell = cellFor(art);
+            const artCell = cellFor(art, singleCol);
             const titleCell = document.createElement('div');
             titleCell.className = 'text-item';
             const titleDiv = document.createElement('div'); titleDiv.className = 'title'; titleDiv.textContent = art.title;
@@ -1019,6 +1073,22 @@
       }
 
       sortSelect.addEventListener('change', render);
+
+      // re-render on resize/rotation so crossing the single-column
+      // breakpoint switches between the lightbox and inline swipe/arrows
+      let resizeTimer = null;
+      let lastSingleCol = isSingleColumnViewport();
+      window.addEventListener('resize', ()=>{
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(()=>{
+          const nowSingleCol = isSingleColumnViewport();
+          if(nowSingleCol !== lastSingleCol){
+            lastSingleCol = nowSingleCol;
+            render();
+            renderSelectedRow();
+          }
+        }, 150);
+      });
 
       // Initial render
       render();
