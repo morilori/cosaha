@@ -61,9 +61,13 @@
       /* manual "zoom" override (mobile only) — lets a visitor see more,
          smaller columns than the automatic breakpoint would give them.
          No minmax floor here on purpose: the whole point is fitting more
-         columns into a narrow screen than 12.5rem/column would allow */
-      body.force-cols-2 .grid,body.force-cols-2 .top-row,body.force-cols-2 .bottom-row,body.force-cols-2 .selected-row{grid-template-columns:repeat(2,1fr)!important}
-      body.force-cols-4 .grid,body.force-cols-4 .top-row,body.force-cols-4 .bottom-row,body.force-cols-4 .selected-row{grid-template-columns:repeat(4,1fr)!important}
+         columns into a narrow screen than 12.5rem/column would allow.
+         top-row/bottom-row are fixed UI tiles (intro, contact), not
+         artwork thumbnails, so they're deliberately excluded — only the
+         artwork grid and the liked-artworks row respond to zoom */
+      body.force-cols-2 .grid,body.force-cols-2 .selected-row{grid-template-columns:repeat(2,1fr)!important}
+      body.force-cols-4 .grid,body.force-cols-4 .selected-row{grid-template-columns:repeat(4,1fr)!important}
+      body.force-cols-4 .grid .text-item{display:none}
       .mobile-top-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:95;background:#fff;border-bottom:0.0625rem solid #e7e3dc;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem}
       @media (max-width:48rem){
         .mobile-top-bar{display:flex}
@@ -521,6 +525,43 @@
       document.getElementById('zoom-switch').addEventListener('click', (e)=>{
         const btn = e.target.closest('.zoom-btn');
         if(btn) setColumnOverride(Number(btn.dataset.cols));
+      });
+
+      // pinch gesture also switches between the same 1/2/4 zoom steps as
+      // the zoom-switch buttons — one step per pinch (not continuous), so
+      // a single gesture can't jump straight from 1 to 4
+      const ZOOM_STEPS = [1, 2, 4];
+      function currentZoomStep(){
+        if(mobileColumnOverride != null) return mobileColumnOverride;
+        const cols = window.getComputedStyle(grid).gridTemplateColumns.split(' ').length || 4;
+        if(cols <= 1) return 1;
+        if(cols <= 2) return 2;
+        return 4;
+      }
+      function touchDist(touches){
+        return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+      }
+      let pinchStartDist = null;
+      let pinchStepped = false;
+      document.addEventListener('touchstart', (e)=>{
+        if(e.touches.length === 2){
+          pinchStartDist = touchDist(e.touches);
+          pinchStepped = false;
+        }
+      }, { passive: true });
+      document.addEventListener('touchmove', (e)=>{
+        if(e.touches.length !== 2 || pinchStartDist == null || pinchStepped) return;
+        const delta = touchDist(e.touches) - pinchStartDist;
+        const PINCH_THRESHOLD = 40; // px of spread/pinch before switching a step
+        if(Math.abs(delta) < PINCH_THRESHOLD) return;
+        const stepIdx = ZOOM_STEPS.indexOf(currentZoomStep());
+        const dir = delta > 0 ? -1 : 1; // spreading apart = fewer, bigger columns; pinching in = more, smaller
+        const nextStep = ZOOM_STEPS[Math.max(0, Math.min(ZOOM_STEPS.length - 1, stepIdx + dir))];
+        if(nextStep !== currentZoomStep()) setColumnOverride(nextStep);
+        pinchStepped = true;
+      }, { passive: true });
+      document.addEventListener('touchend', (e)=>{
+        if(e.touches.length < 2){ pinchStartDist = null; pinchStepped = false; }
       });
 
       document.getElementById('scroll-top-btn').addEventListener('click', ()=>{
