@@ -259,6 +259,17 @@
       let topRow = document.getElementById('top-row');
       // keep a persistent reference to the original controls element so we can safely move it
       const originalControls = document.querySelector('.controls');
+      // same for the logo — render() used to recreate this <img> from
+      // scratch on every sort/like/language change, forcing the browser to
+      // re-decode and repaint it each time, which caused a visible flash
+      // (most noticeable right after a cold page load)
+      const persistentLogoWrap = document.createElement('div');
+      persistentLogoWrap.className = 'logo-item';
+      const persistentLogoImg = document.createElement('img');
+      persistentLogoImg.src = 'Icon.svg';
+      persistentLogoImg.alt = 'Cosaha';
+      persistentLogoImg.className = 'logo-icon';
+      persistentLogoWrap.appendChild(persistentLogoImg);
       const modal = document.getElementById('modal');
       const modalContent = document.getElementById('modal-content');
       const modalPrev = document.getElementById('modal-prev');
@@ -929,15 +940,9 @@
         // clear and rebuild topRow each render; we'll re-append the stored controls node
         topRow.innerHTML = '';
 
-        // insert logo as a single top-row cell
-        const logoWrap = document.createElement('div');
-        logoWrap.className = 'logo-item';
-        const logoImg = document.createElement('img');
-        logoImg.src = 'Icon.svg';
-        logoImg.alt = 'Cosaha';
-        logoImg.className = 'logo-icon';
-        logoWrap.appendChild(logoImg);
-        topRow.appendChild(logoWrap);
+        // move the persistent logo node in rather than recreating it —
+        // see persistentLogoWrap comment for why
+        topRow.appendChild(persistentLogoWrap);
 
         // insert headline as its own top-row cell, with the welcome blurb
         // stacked below it
