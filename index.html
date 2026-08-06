@@ -500,57 +500,26 @@
         return 'General';
       }
 
-      // Convert RGB to HSL hue (0..360) and lightness (0..100)
-      function rgbToHsl(r,g,b){
-        r/=255; g/=255; b/=255;
-        const max = Math.max(r,g,b), min = Math.min(r,g,b);
-        let h, s, l = (max+min)/2;
-        if(max === min){ h = s = 0; }
-        else {
-          const d = max - min;
-          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-          switch(max){
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
-          }
-          h *= 60;
-        }
-        return {h, s: s*100, l: l*100};
-      }
-
-      // shared with the 'color' sort mode, so sorting groups by perceptual
-      // family (this array's order) before fine-sorting by raw hue
+      // one color per artwork, decided by the artist via the folder name's
+      // "-<farbe>" suffix (see scripts/add_color_to_folder_names.py) —
+      // no pixel sampling. Order here also decides "sort by color" bucketing.
       const COLOR_NAMES = ['red','orange','yellow','lime','green','teal','cyan','blue','indigo','violet','magenta','crimson'];
+      const DE_TO_EN_COLOR = {
+        rot:'red', orange:'orange', gelb:'yellow', limette:'lime', grün:'green',
+        petrol:'teal', cyan:'cyan', blau:'blue', indigo:'indigo', violett:'violet',
+        magenta:'magenta', karmesinrot:'crimson'
+      };
+      // matches the trailing color word whether hyphen-joined (appended by
+      // the script) or space-joined (a handful of folders have it as a
+      // natural part of their real title, e.g. "2-bewegtes Rot") — for
+      // *this* purpose (deciding the one color) both count
+      const FOLDER_COLOR_WORD_RE = new RegExp('[-_ ](' + Object.keys(DE_TO_EN_COLOR).join('|') + ')$', 'i');
 
-      function hueToName(h){
-        if (h == null || Number.isNaN(h)) return 'unknown';
-        const index = Math.round(((h % 360) / 360) * COLOR_NAMES.length) % COLOR_NAMES.length;
-        return COLOR_NAMES[index];
+      function colorKeyFromPath(p){
+        const folderName = p.split('/')[1] || '';
+        const m = folderName.match(FOLDER_COLOR_WORD_RE);
+        return m ? DE_TO_EN_COLOR[m[1].toLowerCase()] : 'unknown';
       }
-
-      function computeImageHue(img){
-        try {
-          const cvs = document.createElement('canvas');
-          const ctx = cvs.getContext('2d');
-          const w = 80, h = 80;
-          cvs.width = w; cvs.height = h;
-          ctx.drawImage(img, 0, 0, w, h);
-          const { data } = ctx.getImageData(0, 0, w, h);
-          let r=0,g=0,b=0,count=0;
-          for(let i=0;i<data.length;i+=4){
-            const rr=data[i], gg=data[i+1], bb=data[i+2], aa=data[i+3];
-            if(aa<128) continue;
-            r+=rr; g+=gg; b+=bb; count++;
-          }
-          if(count===0) return {h:null,l:null,name:'unknown'};
-          r/=count; g/=count; b/=count;
-          const hsl = rgbToHsl(r,g,b);
-          return {h:hsl.h, l:hsl.l, name:hueToName(hsl.h)};
-        } catch(e){
-          return {h:null,l:null,name:'unknown'};
-        }
-        }
 
         // build persistent bottom-row with contact tiles
         let bottomRow = document.getElementById('bottom-row');
@@ -812,15 +781,14 @@
           const collection = override.collection || inferCollection(title, s);
           const folder = s.substring(0, s.lastIndexOf('/')) + '/';
           const dateKey = extractDateKey(folderImages[folder] || [s]);
+          const colorName = colorKeyFromPath(s);
           return {
             idx,
             src: s,
             title,
             season,
             collection,
-            hue: null,
-            lightness: null,
-            colorName: 'unknown',
+            colorName,
             dateKey
           };
         });
@@ -844,20 +812,6 @@
         img.loading = 'lazy';
         img.draggable = false;
         img.addEventListener('contextmenu', (e)=>e.preventDefault());
-        img.addEventListener('load', () => {
-          if(item.hue == null){
-            const c = computeImageHue(img);
-            item.hue = c.h; item.lightness = c.l; item.colorName = c.name;
-            // update the meta text if the title/meta cell exists
-            if(item._metaDiv){
-              const parts = [];
-              if(item.colorName) parts.push(tColor(item.colorName));
-              if(item.collection) parts.push(tCollection(item.collection));
-              item._metaDiv.textContent = parts.join(' · ');
-            }
-            if (sortSelect.value === 'color') debouncedRender();
-          }
-        }, { once: true });
         a.appendChild(img);
 
         if(singleCol){
@@ -947,18 +901,13 @@
             case 'title':
               return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
             case 'color': {
-              // group by perceptual color family first (COLOR_NAMES order) so
-              // e.g. hue 359 and hue 1 land together as "red" instead of at
-              // opposite ends of a raw 0-360 sweep; fine-sort within a family
-              // by hue, then lightness
+              // one color per artwork (from the folder name), grouped in
+              // COLOR_NAMES order; tiebreak by title within the same color
               const af = COLOR_NAMES.indexOf(a.colorName); const bf = COLOR_NAMES.indexOf(b.colorName);
               const abucket = af === -1 ? COLOR_NAMES.length : af;
               const bbucket = bf === -1 ? COLOR_NAMES.length : bf;
               if (abucket !== bbucket) return abucket - bbucket;
-              const ah = a.hue ?? 9999; const bh = b.hue ?? 9999;
-              if (ah !== bh) return ah - bh;
-              const al = a.lightness ?? 9999; const bl = b.lightness ?? 9999;
-              return al - bl;
+              return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
             }
             case 'christmas': {
               const ax = a.collection === 'Weihnachten' ? 0 : 1;
