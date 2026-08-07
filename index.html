@@ -12,13 +12,14 @@
       /* base font-size: adjust to scale the whole UI */
       :root{--ui-size:0.9375rem; --headline-size:2rem; --accent:#C34E4E; --select-width:11rem; --control-height:2.25rem}
       html{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-      html,body{height:100%;margin:0;background:#ffffff}
+      html,body{height:100%;margin:0;background:#ffffff;touch-action:pan-y}
       .wrap{max-width:75rem;margin:2.25rem auto;padding:1.125rem}
       .logo-bar{display:flex;align-items:center;justify-content:center;margin:0 0 1.5rem}
       .logo{height:6.25rem;width:auto;display:block}
       h1{font-weight:600;margin:0 0 0.5rem;font-size:var(--headline-size)}
       p.phi{margin:0 0 1rem 0;color:#6b6a66;max-width:none;width:100%;font-size:var(--ui-size)}
-      .controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.625rem;margin:0.625rem 0 1.25rem}
+      .controls{display:flex;flex-direction:column;gap:0.625rem;margin:0.625rem 0 1.25rem}
+      .control-group{display:flex;flex-direction:column;align-items:flex-start;gap:0.25rem}
       .controls label{font-size:var(--ui-size);color:#595853}
       .controls select{appearance:none;padding:0 0.75rem;border:0.0625rem solid #e7e3dc;border-radius:0;background:#fff;font-size:var(--ui-size);height:var(--control-height);display:inline-flex;align-items:center}
       .controls select:focus, .controls select:active, .controls select:focus-visible{
@@ -53,10 +54,15 @@
         .grid,.top-row,.bottom-row,.selected-row{grid-template-columns:repeat(3,minmax(12.5rem,1fr));}
       }
       @media (max-width:48rem){
-        .grid,.top-row,.bottom-row,.selected-row{grid-template-columns:repeat(2,minmax(12.5rem,1fr));}
+        .grid,.selected-row{grid-template-columns:repeat(2,minmax(12.5rem,1fr));}
+        /* top-row/bottom-row are fixed UI tiles, not artwork thumbnails —
+           they should always be single-column in mobile view (where the
+           zoom control appears), regardless of the artwork grid's zoom
+           level, matching the same intent as the force-cols-* rules below */
+        .top-row,.bottom-row{grid-template-columns:repeat(1,minmax(12.5rem,1fr));}
       }
       @media (max-width:32.5rem){
-        .grid,.top-row,.bottom-row,.selected-row{grid-template-columns:repeat(1,minmax(12.5rem,1fr));}
+        .grid,.selected-row{grid-template-columns:repeat(1,minmax(12.5rem,1fr));}
       }
       /* manual "zoom" override (mobile only) — lets a visitor see more,
          smaller columns than the automatic breakpoint would give them.
@@ -114,12 +120,16 @@
       .philosophy-item{background:#fff;border:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:flex-start;padding:0.75rem;aspect-ratio:1/1}
       .philosophy-item .phi{font-size:var(--ui-size);text-align:left;margin:0}
       /* controls inside a tile */
-      .controls-item{position:relative;background:#fff;border:0;display:flex;align-items:center;justify-content:center;padding:0.5rem;aspect-ratio:1/1}
-      .controls-item .controls{width:100%;display:flex;align-items:center;justify-content:flex-start;padding-left:0.5rem}
+      .controls-item{position:relative;background:#fff;border:0;display:flex;align-items:center;justify-content:center;padding:0.5rem;aspect-ratio:1/1;overflow:auto}
+      .controls-item .controls{width:100%;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0.625rem;padding-left:0.5rem}
       .lang-switch{position:absolute;top:0.5rem;right:0.5rem;display:flex;border:0.0625rem solid #e7e3dc;overflow:hidden}
       .lang-btn{background:#fff;border:0;padding:0 0.75rem;font-size:var(--ui-size);height:var(--control-height);cursor:pointer;color:#595853;font-family:inherit}
       .lang-btn.active{background:var(--accent);color:#fff}
       .lang-btn:hover:not(.active){background:#f5f2ec}
+      .filter-switch{display:flex;flex-wrap:wrap;gap:0.375rem}
+      .filter-btn{background:#fff;border:0.0625rem solid #e7e3dc;padding:0 0.6rem;height:var(--control-height);font-size:var(--ui-size);cursor:pointer;color:#595853;font-family:inherit}
+      .filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+      .filter-btn:hover:not(.active){background:#f5f2ec}
       /* bottom-row cells share the same look as other tiles */
       .bottom-row .cell-like{background:#fff;border:0;border-radius:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:0.75rem;aspect-ratio:1/1}
       .cell{position:relative;background:#fff;border:0.0625rem solid #efece6;border-radius:0;overflow:hidden;display:block}
@@ -184,13 +194,24 @@
     </div>
     <div class="wrap">
       <div class="controls">
-        <label for="sort-select">Sort by:</label>
-        <select id="sort-select">
-          <option value="newest">Newest</option>
-          <option value="color">Color</option>
-          <option value="title">Title</option>
-          <option value="christmas">Christmas</option>
-        </select>
+        <div class="control-group">
+          <label for="sort-select">Sort by:</label>
+          <select id="sort-select">
+            <option value="newest">Newest</option>
+            <option value="color">Color</option>
+            <option value="title">Title</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label id="filter-label">Category:</label>
+          <div class="filter-switch" id="filter-switch">
+            <button type="button" class="filter-btn" data-filter="spring">Spring</button>
+            <button type="button" class="filter-btn" data-filter="summer">Summer</button>
+            <button type="button" class="filter-btn" data-filter="autumn">Autumn</button>
+            <button type="button" class="filter-btn" data-filter="winter">Winter</button>
+            <button type="button" class="filter-btn" data-filter="christmas">Christmas</button>
+          </div>
+        </div>
         <div class="lang-switch" id="lang-switch">
           <button type="button" class="lang-btn" data-lang="en">EN</button>
           <button type="button" class="lang-btn active" data-lang="de">DE</button>
@@ -234,7 +255,12 @@
           sortNewest: 'Newest',
           sortColor: 'Color',
           sortTitle: 'Title',
-          sortChristmas: 'Christmas',
+          filterBy: 'Category:',
+          filterSpring: 'Spring',
+          filterSummer: 'Summer',
+          filterAutumn: 'Autumn',
+          filterWinter: 'Winter',
+          filterChristmas: 'Christmas',
           headline: 'Bring color into your home.',
           introWelcome: 'Welcome to my page featuring colorful wall art in the form of handmade prints created with acrylic paint on paper, known as gel prints. They cannot be replicated, so each piece is one-of-a-kind.',
           introDetails: 'I love experimenting with colors, shapes, textures, and materials. To create my monoprints, I use natural materials like leaves and grasses, as well as all kinds of everyday objects—even empty packaging materials.\nThis wide range of materials is what makes the results so diverse and unique. The only constant is the Gelli Plate itself, with its square shape measuring 15 x 15 cm. Have fun browsing!',
@@ -259,7 +285,12 @@
           sortNewest: 'Neueste',
           sortColor: 'Farbe',
           sortTitle: 'Titel',
-          sortChristmas: 'Weihnachten',
+          filterBy: 'Kategorie:',
+          filterSpring: 'Frühling',
+          filterSummer: 'Sommer',
+          filterAutumn: 'Herbst',
+          filterWinter: 'Winter',
+          filterChristmas: 'Weihnachten',
           headline: 'Bring Farbe in \ndein Zuhause.',
           introWelcome: 'Willkommen auf meiner Seite der farbenfrohen Wandkunst in Form von handgefertigten Drucken mit Acrylfarbe auf Papier, sogenannten Gelprints. Sie sind nicht wiederholbar und somit ist jedes Stück ein Unikat.',
           introDetails: 'Ich liebe es, mit Farben, Formen, Texturen und Materialien zu experimentieren. So verwende ich für die Gestaltung meiner Monoprints natürliche Materialien wie Blätter und Gräser, aber auch Alltagsgegenstände aller Art bis hin zu leeren Verpackungsmaterialien.\nDiese Bandbreite macht die Ergebnisse so vielfältig und individuell. Die einzige Konstante ist die Gelli Plate selbst mit ihrer quadratischen Form von 15 x 15 cm. Viel Spaß beim Stöbern!',
@@ -284,6 +315,102 @@
       // sort keys); translate only for display
       function tColor(name){ return translations[currentLang].colors[name] || name; }
       function tCollection(name){ return translations[currentLang].collections[name] || name; }
+      // artwork titles are derived from (German) folder names and stored as
+      // the canonical/internal title on each item; translate only for
+      // display when in English. Titles left out of this map (e.g. the
+      // already-English "Springtime", or "Aus∕fbruch" — a stylized title
+      // without a clean literal translation) are shown unchanged.
+      const TITLE_TRANSLATIONS_EN = {
+        'Frühlingswogen': 'Spring Waves',
+        'bewegtes Rot': 'Moving Red',
+        'Auftrieb': 'Buoyancy',
+        'Blattgeflüster in Türkis': 'Leaf Whispers in Turquoise',
+        'Wasserwelten': 'Water Worlds',
+        'Sonnenstrahlen auf Holz': 'Sunbeams on Wood',
+        'goldene Blattpoesie': 'Golden Leaf Poetry',
+        'Twin 1 Blau': 'Twin 1 Blue',
+        'Twin 2 Blau': 'Twin 2 Blue',
+        'Twins Blau': 'Twins Blue',
+        'Twin 1 Orange': 'Twin 1 Orange',
+        'Twin 2 Orange': 'Twin 2 Orange',
+        'Twins Orange': 'Twins Orange',
+        'Himmelstropfen': 'Sky Drops',
+        'Schichtenweise': 'Layer by Layer',
+        'umrahmtes Lichtspiel': 'Framed Play of Light',
+        'Weidengeister': 'Willow Spirits',
+        'flüchtige Gedanken': 'Fleeting Thoughts',
+        'verwobene Erinnerung': 'Interwoven Memory',
+        'zwischen Chaos und Klarheit': 'Between Chaos and Clarity',
+        'Kraft der Sonne': 'Power of the Sun',
+        'Herbstspuren im Sonnenlicht': 'Autumn Traces in Sunlight',
+        'Herbstgeflüster': 'Autumn Whispers',
+        'Farbenfrohes Blättermeer': 'Colorful Sea of Leaves',
+        'Muster des Waldes': 'Patterns of the Forest',
+        'Farbtanz im Wind': 'Color Dance in the Wind',
+        'Blättertanz im Sonnenlicht': 'Leaf Dance in Sunlight',
+        'abstraktes Orange': 'Abstract Orange',
+        'goldener Weihnachtsduft': 'Golden Christmas Scent',
+        'weihnachtliches Baumgeflüster': 'Christmas Tree Whispers',
+        'tanzende Weihnachtsbäume': 'Dancing Christmas Trees',
+        'Weihnachtsbaumblätter': 'Christmas Tree Leaves',
+        'Tannenreigen': 'Fir Tree Dance',
+        'Weihnachtsgedanken': 'Christmas Thoughts',
+        'rote Weihnacht 1': 'Red Christmas 1',
+        'weihnachtliches Schneegestöber': 'Christmas Snow Flurry',
+        'Sommer am See': 'Summer at the Lake',
+        'rote Weihnacht 2': 'Red Christmas 2',
+        'Weihnachtsreigen': 'Christmas Round Dance',
+        'Weihnacht blau silber': 'Christmas Blue Silver',
+        'Rosenblätter': 'Rose Petals',
+        'Rotes Labyrinth': 'Red Labyrinth',
+        'Strandgeister': 'Beach Spirits',
+        'Sandgewusel': 'Sand Bustle',
+        'Verästelung': 'Branching',
+        'Zellteilung': 'Cell Division',
+        'Sommerwirbel': 'Summer Whirl',
+        'Himmelswirbel': 'Sky Whirl',
+        'Unterwasserwelt 2': 'Underwater World 2',
+        'Unterwasserwelt 1': 'Underwater World 1',
+        'Frühlingswind': 'Spring Wind',
+        'Herbstsonne': 'Autumn Sun',
+        'Herbstregen': 'Autumn Rain',
+        'Gedankennebel': 'Fog of Thoughts',
+        'Lebensgerüst': 'Framework of Life',
+        'Geteilt': 'Divided',
+        'Auf und Ab': 'Up and Down',
+        'Eigenart': 'Peculiarity',
+        'Frühlingsbeginn': 'Beginning of Spring',
+        'Kraft der Natur 3': 'Force of Nature 3',
+        'Kraft der Natur 2': 'Force of Nature 2',
+        'Kraft der Natur': 'Force of Nature',
+        'Blumenwiese 1': 'Flower Meadow 1',
+        'Blumenwiese 2': 'Flower Meadow 2',
+        'Blumenwiese 3': 'Flower Meadow 3',
+        'Blumenwiese 4': 'Flower Meadow 4',
+        'Savanne': 'Savanna',
+        'Gedankenverästelung': 'Branching Thoughts',
+        'Herbstwind': 'Autumn Wind',
+        'Morgensonne': 'Morning Sun',
+        'Sturmwind': 'Storm Wind',
+        'Sonnenfächer': 'Sun Fan',
+        'Gemeinschaft': 'Togetherness',
+        'Verzweigung': 'Divergence',
+        'Sommerfarn': 'Summer Fern',
+        'Wassergras': 'Water Grass',
+        'Feuergras': 'Fire Grass',
+        'Verwirrung': 'Confusion',
+        'Gedankengänge': 'Trains of Thought',
+        'Himmelstraum': 'Sky Dream',
+        'Blütenstruktur blau': 'Blossom Structure Blue',
+        'Gefrierzone': 'Freeze Zone',
+        'Feuerblume': 'Fire Flower',
+        'Gedankenkreisel': 'Thought Spiral',
+        'Eisblume': 'Ice Flower'
+      };
+      function tTitle(title){
+        if(currentLang !== 'en') return title;
+        return TITLE_TRANSLATIONS_EN[title] || title;
+      }
       // ---------------------------------------------------------------------
 
       const grid = document.getElementById('grid');
@@ -333,7 +460,17 @@
           }
           return arr[0];
         };
-        const mains = Object.keys(folderImages).sort((a,b)=>a.localeCompare(b)).map(folder=> pickMain(folderImages[folder])).filter(Boolean);
+        // sort by the folder's leading number numerically, not as a plain
+        // string — "10-..." otherwise sorts right after "1-...", ahead of
+        // "2-..." through "9-...", scrambling the intended artwork order
+        const folderSortKey = (k) => {
+          const m = k.match(/^Art\/(\d+)/);
+          return m ? parseInt(m[1], 10) : Infinity; // non-numeric folders (e.g. Frame) sort last
+        };
+        const mains = Object.keys(folderImages).sort((a,b)=>{
+          const na = folderSortKey(a), nb = folderSortKey(b);
+          return na !== nb ? na - nb : a.localeCompare(b);
+        }).map(folder=> pickMain(folderImages[folder])).filter(Boolean);
         if(mains.length){
           artworkSources = mains.slice();
           buildItems();
@@ -397,7 +534,7 @@
         const large = document.createElement('img');
         const largeSrc = (src && src.normalize) ? src.normalize('NFC') : src;
         large.src = encodeURI(largeSrc);
-        large.alt = item ? item.title : titleFromPath(src);
+        large.alt = item ? tTitle(item.title) : titleFromPath(src);
         large.draggable = false;
         large.addEventListener('contextmenu', (e)=>e.preventDefault());
         // double tap/double click the enlarged image toggles selection,
@@ -413,7 +550,7 @@
         });
         modalContent.appendChild(large);
         modal.setAttribute('aria-hidden','false');
-        cap.textContent = item ? item.title : titleFromPath(src);
+        cap.textContent = item ? tTitle(item.title) : titleFromPath(src);
         cap.style.display = 'block';
 
         const hasMultiple = modalFiles.length > 1;
@@ -435,41 +572,55 @@
       const sortSelect = document.getElementById('sort-select');
 
       // build a custom-styled select UI to replace native dropdown visuals (so hover/focus use our accent)
-      const SORT_LABEL_KEYS = { newest: 'sortNewest', color: 'sortColor', title: 'sortTitle', christmas: 'sortChristmas' };
+      const OPTION_LABEL_KEYS = {
+        newest: 'sortNewest', color: 'sortColor', title: 'sortTitle',
+        spring: 'filterSpring', summer: 'filterSummer', autumn: 'filterAutumn', winter: 'filterWinter', christmas: 'filterChristmas'
+      };
 
-      function sortOptionLabel(value){
-        return t(SORT_LABEL_KEYS[value] || value);
+      function optionLabel(value){
+        return t(OPTION_LABEL_KEYS[value] || value);
       }
 
-      // re-applies current-language text to the sort label, the custom
-      // select's button/list items, and the modal nav aria-labels
+      // custom-styled dropdown(s) built by createCustomSelect (currently just sort)
+      const customSelects = [];
+
+      // multi-select: an artwork matching ANY active filter is shown;
+      // empty set = no filter = show everything
+      const activeFilters = new Set();
+
+      // re-applies current-language text to the sort/filter labels, the
+      // custom select's button/list items, the filter buttons, and the
+      // modal nav aria-labels
       function updateSortLabels(){
-        const labelEl = document.querySelector('label[for="sort-select"]');
-        if(labelEl) labelEl.textContent = t('sortBy');
-        document.querySelectorAll('.custom-select-item').forEach(it=>{
-          it.textContent = sortOptionLabel(it.dataset.value);
+        const sortLabelEl = document.querySelector('label[for="sort-select"]');
+        if(sortLabelEl) sortLabelEl.textContent = t('sortBy');
+        const filterLabelEl = document.getElementById('filter-label');
+        if(filterLabelEl) filterLabelEl.textContent = t('filterBy');
+        document.querySelectorAll('.filter-btn').forEach(btn=>{
+          btn.textContent = optionLabel(btn.dataset.filter);
         });
-        const btn = document.querySelector('.custom-select-button');
-        if(btn) btn.textContent = sortOptionLabel(sortSelect.value);
+        customSelects.forEach(({ sel, button, list })=>{
+          Array.from(list.children).forEach(it=>{ it.textContent = optionLabel(it.dataset.value); });
+          button.textContent = optionLabel(sel.value);
+        });
         modalPrev.setAttribute('aria-label', t('prevAria'));
         modalNext.setAttribute('aria-label', t('nextAria'));
         document.getElementById('scroll-top-btn').setAttribute('aria-label', t('scrollTopAria'));
       }
 
-      function createCustomSelect(){
-        const container = document.querySelector('.controls');
-        if(!container || container.querySelector('.custom-select')) return;
-        const sel = sortSelect;
-        // keep native select in memory but remove it from DOM (we'll drive sorting from JS)
+      function createCustomSelect(sel, insertBeforeEl){
+        const container = sel.parentElement;
+        if(!container) return;
+        // keep native select in memory but remove it from DOM (we'll drive it from JS)
         sel.style.position = 'absolute'; sel.style.left = '-9999px'; sel.style.top = 'auto';
 
         const wrapper = document.createElement('div'); wrapper.className = 'custom-select';
         const button = document.createElement('button'); button.type = 'button'; button.className = 'custom-select-button';
-        button.textContent = sortOptionLabel(sel.value);
+        button.textContent = optionLabel(sel.value);
         const list = document.createElement('div'); list.className = 'custom-select-list'; list.style.display = 'none';
 
         Array.from(sel.options).forEach(opt=>{
-          const it = document.createElement('div'); it.className = 'custom-select-item'; it.textContent = sortOptionLabel(opt.value); it.dataset.value = opt.value;
+          const it = document.createElement('div'); it.className = 'custom-select-item'; it.textContent = optionLabel(opt.value); it.dataset.value = opt.value;
           it.addEventListener('click', ()=>{
             sel.value = it.dataset.value;
             button.textContent = it.textContent;
@@ -482,12 +633,22 @@
         button.addEventListener('click', (e)=>{ e.stopPropagation(); list.style.display = list.style.display === 'none' ? 'block' : 'none'; });
         document.addEventListener('click', ()=>{ list.style.display = 'none'; });
         wrapper.appendChild(button); wrapper.appendChild(list);
-        container.insertBefore(wrapper, document.getElementById('lang-switch'));
+        container.insertBefore(wrapper, insertBeforeEl);
         // remove the original select element from the DOM so only the custom control is visible
-        if(sel.parentNode) sel.parentNode.removeChild(sel);
+        if(sel.parentNode === container) container.removeChild(sel);
+        customSelects.push({ sel, button, list });
       }
 
-      createCustomSelect();
+      createCustomSelect(sortSelect, null); // null = append at the end of its own .control-group
+
+      document.getElementById('filter-switch').addEventListener('click', (e)=>{
+        const btn = e.target.closest('.filter-btn');
+        if(!btn) return;
+        const val = btn.dataset.filter;
+        if(activeFilters.has(val)){ activeFilters.delete(val); btn.classList.remove('active'); }
+        else { activeFilters.add(val); btn.classList.add('active'); }
+        render();
+      });
 
       function setLang(lang){
         if(lang === currentLang) return;
@@ -550,7 +711,12 @@
         }
       }, { passive: true });
       document.addEventListener('touchmove', (e)=>{
-        if(e.touches.length !== 2 || pinchStartDist == null || pinchStepped) return;
+        if(e.touches.length !== 2) return;
+        // block the browser's native pinch-zoom so it doesn't fight with
+        // (or pre-empt) our own step-based column switching below —
+        // requires a non-passive listener to be allowed to call this
+        e.preventDefault();
+        if(pinchStartDist == null || pinchStepped) return;
         const delta = touchDist(e.touches) - pinchStartDist;
         const PINCH_THRESHOLD = 40; // px of spread/pinch before switching a step
         if(Math.abs(delta) < PINCH_THRESHOLD) return;
@@ -559,7 +725,7 @@
         const nextStep = ZOOM_STEPS[Math.max(0, Math.min(ZOOM_STEPS.length - 1, stepIdx + dir))];
         if(nextStep !== currentZoomStep()) setColumnOverride(nextStep);
         pinchStepped = true;
-      }, { passive: true });
+      }, { passive: false });
       document.addEventListener('touchend', (e)=>{
         if(e.touches.length < 2){ pinchStartDist = null; pinchStepped = false; }
       });
@@ -590,6 +756,7 @@
       // Optional manual metadata overrides by image path
       // Example: {'Art/33-Sommer am See/33_main.jpg': { season: 'Summer', collection: 'Lakes' }}
       const metadataOverrides = {
+        'Art/33-Tannenreigen-grün/29_main.jpg': { collection: 'Weihnachten' }
       };
 
       function inferSeason(title){
@@ -671,8 +838,8 @@
           const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
           let subject, body;
           if(chosen.length){
-            subject = t('mailSubjectPrefix') + chosen.map(it=>it.title).join(', ');
-            body = t('mailGreeting') + chosen.map(it=>it.title).join('\n- ') + "\n\n";
+            subject = t('mailSubjectPrefix') + chosen.map(it=>tTitle(it.title)).join(', ');
+            body = t('mailGreeting') + chosen.map(it=>tTitle(it.title)).join('\n- ') + "\n\n";
           } else {
             subject = t('mailSubjectGeneric');
             body = '';
@@ -717,7 +884,7 @@
           const bySrc = new Map(items.map(it=>[it.src, it]));
           const chosen = [...selected].map(src=>bySrc.get(src)).filter(Boolean);
           bar.querySelector('.selection-bar-label').textContent = t('selectionBarLabel');
-          bar.querySelector('.selection-bar-names').textContent = chosen.map(it=>it.title).join(', ');
+          bar.querySelector('.selection-bar-names').textContent = chosen.map(it=>tTitle(it.title)).join(', ');
           // two labels, swapped by a media query — the full label overflows
           // the bar on narrow/mobile screens
           document.getElementById('request-availability-btn').innerHTML =
@@ -881,6 +1048,102 @@
         return best;
       }
 
+      // multi-category tags per artwork, from Kategorien.xlsx — unlike
+      // `season` (a single inferred value from the title), a piece can
+      // belong to several of these at once. Keyed by the exact title
+      // titleFromPath() produces; verified against the sheet's own
+      // per-column totals (48/49/52/46/11) before being transcribed here.
+      // "Schichtenweise" has no row in the sheet, so it gets no tags.
+      const SEASON_TAGS = {
+        'Auf und Ab': ['spring', 'summer', 'autumn', 'winter'],
+        'Auftrieb': ['spring', 'summer', 'autumn', 'winter'],
+        'Aus∕fbruch': ['spring', 'summer', 'autumn', 'winter'],
+        'Blattgeflüster in Türkis': ['spring', 'summer', 'autumn'],
+        'Blumenwiese 1': ['spring', 'summer'],
+        'Blumenwiese 2': ['spring', 'summer'],
+        'Blumenwiese 3': ['spring', 'summer'],
+        'Blumenwiese 4': ['spring', 'summer'],
+        'Blättertanz im Sonnenlicht': ['autumn'],
+        'Blütenstruktur blau': ['spring', 'summer', 'autumn', 'winter'],
+        'Eigenart': ['spring', 'summer', 'autumn', 'winter'],
+        'Eisblume': ['winter'],
+        'Farbenfrohes Blättermeer': ['autumn'],
+        'Farbtanz im Wind': ['summer', 'autumn'],
+        'Feuerblume': ['spring', 'summer', 'autumn'],
+        'Feuergras': ['spring', 'summer', 'autumn', 'winter'],
+        'Frame': ['spring', 'summer', 'autumn', 'winter', 'christmas'],
+        'Frühlingsbeginn': ['spring'],
+        'Frühlingswind': ['spring'],
+        'Frühlingswogen': ['spring'],
+        'Gedankengänge': ['spring', 'summer', 'autumn', 'winter'],
+        'Gedankenkreisel': ['spring', 'summer', 'autumn', 'winter'],
+        'Gedankennebel': ['spring', 'summer', 'autumn', 'winter'],
+        'Gedankenverästelung': ['spring', 'summer', 'autumn', 'winter'],
+        'Gefrierzone': ['spring', 'autumn', 'winter'],
+        'Gemeinschaft': ['spring', 'summer', 'autumn', 'winter'],
+        'Geteilt': ['spring', 'summer', 'autumn', 'winter'],
+        'Herbstgeflüster': ['autumn'],
+        'Herbstregen': ['autumn'],
+        'Herbstsonne': ['autumn'],
+        'Herbstspuren im Sonnenlicht': ['autumn'],
+        'Herbstwind': ['autumn'],
+        'Himmelstraum': ['spring', 'summer', 'autumn', 'winter'],
+        'Himmelstropfen': ['spring', 'summer', 'autumn', 'winter'],
+        'Himmelswirbel': ['spring', 'summer', 'autumn', 'winter'],
+        'Kraft der Natur': ['spring', 'summer'],
+        'Kraft der Natur 2': ['spring', 'summer'],
+        'Kraft der Natur 3': ['spring', 'summer'],
+        'Kraft der Sonne': ['summer'],
+        'Lebensgerüst': ['spring', 'summer', 'autumn', 'winter'],
+        'Morgensonne': ['spring', 'autumn'],
+        'Muster des Waldes': ['autumn'],
+        'Rosenblätter': ['spring', 'summer', 'autumn'],
+        'Rotes Labyrinth': ['spring', 'summer', 'autumn', 'winter'],
+        'Sandgewusel': ['summer'],
+        'Savanne': ['summer'],
+        'Sommer am See': ['summer'],
+        'Sommerfarn': ['summer'],
+        'Sommerwirbel': ['summer'],
+        'Sonnenfächer': ['spring', 'summer', 'autumn', 'winter'],
+        'Sonnenstrahlen auf Holz': ['spring', 'summer', 'autumn'],
+        'Springtime': ['spring'],
+        'Strandgeister': ['summer'],
+        'Sturmwind': ['spring', 'autumn'],
+        'Tannenreigen': ['winter', 'christmas'],
+        'Twin 1 Blau': ['spring', 'summer', 'autumn', 'winter'],
+        'Twin 1 Orange': ['spring', 'summer', 'autumn', 'winter'],
+        'Twin 2 Blau': ['spring', 'summer', 'autumn', 'winter'],
+        'Twin 2 Orange': ['spring', 'summer', 'autumn', 'winter'],
+        'Twins Blau': ['spring', 'summer', 'autumn', 'winter'],
+        'Twins Orange': ['spring', 'summer', 'autumn', 'winter'],
+        'Unterwasserwelt 1': ['spring', 'summer', 'autumn', 'winter'],
+        'Unterwasserwelt 2': ['spring', 'summer', 'autumn', 'winter'],
+        'Verwirrung': ['spring', 'summer', 'autumn', 'winter'],
+        'Verzweigung': ['spring', 'summer', 'autumn', 'winter'],
+        'Verästelung': ['spring', 'summer', 'autumn', 'winter'],
+        'Wassergras': ['spring', 'summer', 'autumn', 'winter'],
+        'Wasserwelten': ['spring', 'summer', 'autumn', 'winter'],
+        'Weidengeister': ['spring', 'summer', 'autumn'],
+        'Weihnacht blau silber': ['winter', 'christmas'],
+        'Weihnachtsbaumblätter': ['winter', 'christmas'],
+        'Weihnachtsgedanken': ['winter', 'christmas'],
+        'Weihnachtsreigen': ['winter', 'christmas'],
+        'Zellteilung': ['spring', 'summer', 'autumn', 'winter'],
+        'abstraktes Orange': ['spring', 'summer', 'autumn', 'winter'],
+        'bewegtes Rot': ['spring', 'summer', 'autumn', 'winter'],
+        'flüchtige Gedanken': ['spring', 'summer', 'autumn', 'winter'],
+        'goldene Blattpoesie': ['autumn'],
+        'goldener Weihnachtsduft': ['winter', 'christmas'],
+        'rote Weihnacht 1': ['winter', 'christmas'],
+        'rote Weihnacht 2': ['winter', 'christmas'],
+        'tanzende Weihnachtsbäume': ['winter', 'christmas'],
+        'umrahmtes Lichtspiel': ['spring', 'summer', 'autumn', 'winter'],
+        'verwobene Erinnerung': ['spring', 'summer', 'autumn', 'winter'],
+        'weihnachtliches Baumgeflüster': ['winter', 'christmas'],
+        'weihnachtliches Schneegestöber': ['winter', 'christmas'],
+        'zwischen Chaos und Klarheit': ['spring', 'summer', 'autumn', 'winter']
+      };
+
       function buildItems(){
         items = artworkSources.map((src, idx) => {
           const s = (src && src.normalize) ? src.normalize('NFC') : src;
@@ -888,6 +1151,7 @@
           const override = metadataOverrides[s] || {};
           const season = override.season || inferSeason(title);
           const collection = override.collection || inferCollection(title, s);
+          const seasons = SEASON_TAGS[title] || [];
           const folder = s.substring(0, s.lastIndexOf('/')) + '/';
           const dateKey = extractDateKey(folderImages[folder] || [s]);
           const colorName = colorKeyFromPath(s);
@@ -897,6 +1161,7 @@
             title,
             season,
             collection,
+            seasons,
             colorName,
             dateKey
           };
@@ -917,7 +1182,7 @@
         const img = document.createElement('img');
         const imgSrc = (item.src && item.src.normalize) ? item.src.normalize('NFC') : item.src;
         img.src = encodeURI(imgSrc);
-        img.alt = item.title;
+        img.alt = tTitle(item.title);
         img.loading = 'lazy';
         img.draggable = false;
         img.addEventListener('contextmenu', (e)=>e.preventDefault());
@@ -1006,7 +1271,12 @@
 
       function render(){
         const mode = sortSelect.value;
-        const list = items.slice();
+        // filter by season/category (an artwork can belong to several at
+        // once, per Kategorien.xlsx); multi-select — an item matching ANY
+        // active filter is shown; no active filters = show everything
+        let list = activeFilters.size === 0
+          ? items.slice()
+          : items.filter(it => (it.seasons || []).some(s => activeFilters.has(s)));
         list.sort((a,b)=>{
           switch(mode){
             case 'newest': {
@@ -1024,12 +1294,6 @@
               const abucket = af === -1 ? COLOR_NAMES.length : af;
               const bbucket = bf === -1 ? COLOR_NAMES.length : bf;
               if (abucket !== bbucket) return abucket - bbucket;
-              return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
-            }
-            case 'christmas': {
-              const ax = a.collection === 'Weihnachten' ? 0 : 1;
-              const bx = b.collection === 'Weihnachten' ? 0 : 1;
-              if (ax !== bx) return ax - bx;
               return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
             }
             default:
@@ -1107,7 +1371,7 @@
             const artCell = cellFor(art, singleCol);
             const titleCell = document.createElement('div');
             titleCell.className = 'text-item';
-            const titleDiv = document.createElement('div'); titleDiv.className = 'title'; titleDiv.textContent = art.title;
+            const titleDiv = document.createElement('div'); titleDiv.className = 'title'; titleDiv.textContent = tTitle(art.title);
             const metaDiv = document.createElement('div'); metaDiv.className = 'meta';
             const metaParts = [];
             if (art.colorName) metaParts.push(tColor(art.colorName));
