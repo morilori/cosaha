@@ -1385,8 +1385,10 @@
         // determine current number of columns from computed style
         const computedCols = window.getComputedStyle(grid).gridTemplateColumns.split(' ').length || 4;
         // prefer two artworks per row; fall back to 1 if columns are too small
+        // (at exactly 2 columns one pair fills a row, so the text/artwork
+        // side alternates on every visual row)
         let pairsPerRow = 2;
-        if (computedCols < 2) pairsPerRow = 1;
+        if (computedCols <= 2) pairsPerRow = 1;
         const preCount = grid.children.length;
         let idx = 0;
         let rowIndex = Math.floor(preCount / computedCols);
