@@ -74,9 +74,11 @@
       body.force-cols-2 .grid,body.force-cols-2 .selected-row{grid-template-columns:repeat(2,1fr)!important}
       body.force-cols-4 .grid,body.force-cols-4 .selected-row{grid-template-columns:repeat(4,1fr)!important}
       body.force-cols-4 .grid .text-item{display:none}
-      .mobile-top-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:95;background:#fff;border-bottom:0.0625rem solid #e7e3dc;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem}
-      @media (max-width:48rem){
-        .mobile-top-bar{display:flex}
+      /* top bar shows at every width (logo = scroll to top); only the
+         zoom switch inside it is mobile-only */
+      .mobile-top-bar{display:flex;position:fixed;top:0;left:0;right:0;z-index:95;background:#fff;border-bottom:0.0625rem solid #e7e3dc;align-items:center;justify-content:space-between;padding:0.5rem 0.75rem}
+      @media (min-width:48.0625rem){
+        .mobile-top-bar .zoom-switch{display:none}
       }
       .mobile-top-logo-btn{background:none;border:0;padding:0;margin:0;cursor:pointer;display:flex;align-items:center}
       .mobile-top-logo-img{height:2rem;width:auto;display:block}
@@ -1432,11 +1434,9 @@
 
       sortSelect.addEventListener('change', render);
 
-      // the mobile top bar is fixed and always-on-top (like the selection
-      // bar), so the lightbox needs matching top padding or the enlarged
-      // image would render underneath it; offsetHeight is naturally 0 when
-      // the bar's media query makes it display:none, so this needs no
-      // separate "are we on mobile" check of its own
+      // the top bar is fixed and always-on-top (like the selection bar),
+      // so the page and lightbox need matching top padding or content
+      // would render underneath it
       function updateMobileTopBarSpacing(){
         const bar = document.getElementById('mobile-top-bar');
         const h = bar.offsetHeight + 'px';
