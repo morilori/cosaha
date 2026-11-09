@@ -176,6 +176,13 @@
          4rem is a fallback for the instant before JS measures the bar's
          actual height in renderSelectionBar() */
       #bottom-spacer{height:4rem}
+      /* floating back-to-top — sits just above the fixed selection bar and
+         only appears once the user has scrolled down a bit */
+      .back-to-top-btn{position:fixed;right:1rem;bottom:calc(1rem + var(--selection-bar-height, 4rem));z-index:90;width:2.5rem;height:2.5rem;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:1.125rem;line-height:1;cursor:pointer;box-shadow:0 0.0625rem 0.25rem rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+      .back-to-top-btn.visible{opacity:1;pointer-events:auto}
+      /* stays pinned to the top-right of the scrolling Impressum box */
+      .impressum-close-btn{position:sticky;top:0;float:right;width:2rem;height:2rem;border:0;background:#fff;color:#595853;font-size:1.5rem;line-height:1;cursor:pointer;font-family:inherit}
+      .impressum-close-btn:hover{color:var(--accent)}
       #request-availability-btn .label-short{display:none}
       @media (max-width:32.5rem){
         h1{font-size:1.375rem}
@@ -235,6 +242,8 @@
     </div>
     <div id="cap" class="caption" aria-hidden="true"></div>
 
+    <button type="button" id="back-to-top-btn" class="back-to-top-btn" aria-label="Scroll to top">↑</button>
+
     <div id="selection-bar" class="selection-bar">
       <div class="selection-bar-inner">
         <span class="selection-bar-label"></span>
@@ -279,6 +288,7 @@
           nextAria: 'Next',
           markInterested: 'Mark as interested',
           scrollTopAria: 'Scroll to top',
+          closeAria: 'Close',
           mailGreeting: "Hi,\n\nI'm interested in the following artworks:\n- ",
           mailSubjectPrefix: 'Interest in artworks: ',
           mailSubjectGeneric: 'Website inquiry',
@@ -309,6 +319,7 @@
           nextAria: 'Weiter',
           markInterested: 'Als interessant markieren',
           scrollTopAria: 'Nach oben scrollen',
+          closeAria: 'Schließen',
           mailGreeting: 'Hallo,\n\nich interessiere mich für folgende Kunstwerke:\n- ',
           mailSubjectPrefix: 'Interesse an Kunstwerken: ',
           mailSubjectGeneric: 'Anfrage über die Website',
@@ -624,6 +635,7 @@
         modalPrev.setAttribute('aria-label', t('prevAria'));
         modalNext.setAttribute('aria-label', t('nextAria'));
         document.getElementById('scroll-top-btn').setAttribute('aria-label', t('scrollTopAria'));
+        document.getElementById('back-to-top-btn').setAttribute('aria-label', t('scrollTopAria'));
       }
 
       function createCustomSelect(sel, insertBeforeEl){
@@ -751,6 +763,16 @@
       document.getElementById('scroll-top-btn').addEventListener('click', ()=>{
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
+
+      const backToTopBtn = document.getElementById('back-to-top-btn');
+      backToTopBtn.addEventListener('click', ()=>{
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      function updateBackToTop(){
+        backToTopBtn.classList.toggle('visible', window.scrollY > 400);
+      }
+      window.addEventListener('scroll', updateBackToTop, { passive: true });
+      updateBackToTop();
 
       // folder names carry a "-<farbe>" suffix (see
       // scripts/add_color_to_folder_names.py) for organization, but it
@@ -951,6 +973,7 @@
           wrapper.style.background = '#fff';
           wrapper.style.padding = '1rem';
           wrapper.innerHTML = `
+            <button type="button" class="impressum-close-btn" aria-label="${t('closeAria')}">×</button>
             <h2>Impressum</h2>
             <p>Angaben gemäß § 5 DDG:</p>
             <p>
@@ -1033,6 +1056,7 @@
             <h3>9. Änderungen dieser Datenschutzerklärung</h3>
             <p>Wir behalten uns vor, diese Datenschutzerklärung anzupassen, wenn dies aufgrund geänderter gesetzlicher Vorgaben oder technischer Änderungen erforderlich wird.</p>
           `;
+          wrapper.querySelector('.impressum-close-btn').addEventListener('click', closeModal);
           modalContent.appendChild(wrapper);
           modal.setAttribute('aria-hidden','false');
           cap.textContent = t('impressum');
@@ -1475,14 +1499,15 @@
       renderSelectionBar();
       updateMobileTopBarSpacing();
 
+      function closeModal(){
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        modalContent.innerHTML = '';
+        cap.style.display = 'none';
+      }
       modal.addEventListener('click', (e)=>{
         // close only when clicking the backdrop, not when clicking modal content or nav buttons
-        if(e.target === modal){
-          modal.classList.remove('open');
-          modal.setAttribute('aria-hidden','true');
-          modalContent.innerHTML = '';
-          cap.style.display = 'none';
-        }
+        if(e.target === modal) closeModal();
       });
       modalPrev.addEventListener('click', (e)=>{ e.stopPropagation(); modalPrevClick(); });
       modalNext.addEventListener('click', (e)=>{ e.stopPropagation(); modalNextClick(); });
