@@ -25,3 +25,8 @@ yarn-debug.log*
 yarn-error.log*
 /.sass-cache
 .sass-cache/
+# videos are not shown on the site and push it past the GitHub Pages size limit
+*.mp4
+*.MP4
+*.mov
+*.MOV
