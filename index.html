@@ -223,6 +223,7 @@
             <button type="button" class="filter-btn" data-filter="autumn">Autumn</button>
             <button type="button" class="filter-btn" data-filter="winter">Winter</button>
             <button type="button" class="filter-btn" data-filter="christmas">Christmas</button>
+            <button type="button" class="filter-btn" data-filter="yearround">Year-round</button>
           </div>
         </div>
         <div class="lang-switch" id="lang-switch">
@@ -276,6 +277,7 @@
           filterAutumn: 'Autumn',
           filterWinter: 'Winter',
           filterChristmas: 'Christmas',
+          filterYearround: 'Year-round',
           headline: 'Bring color into your home.',
           introWelcome: 'Welcome to my page featuring colorful wall art in the form of handmade prints created with acrylic paint on paper, known as gel prints. They cannot be replicated, so each piece is one-of-a-kind.',
           introDetails: 'I love experimenting with colors, shapes, textures, and materials. To create my monoprints, I use natural materials like leaves and grasses, as well as all kinds of everyday objects—even empty packaging materials.\nThis wide range of materials is what makes the results so diverse and unique. The only constant is the Gelli Plate itself, with its square shape measuring 15 x 15 cm. Have fun browsing!',
@@ -307,6 +309,7 @@
           filterAutumn: 'Herbst',
           filterWinter: 'Winter',
           filterChristmas: 'Weihnachten',
+          filterYearround: 'Ganzjährig',
           headline: 'Bring Farbe in \ndein Zuhause.',
           introWelcome: 'Willkommen auf meiner Seite der farbenfrohen Wandkunst in Form von handgefertigten Drucken mit Acrylfarbe auf Papier, sogenannten Gelprints. Sie sind nicht wiederholbar und somit ist jedes Stück ein Unikat.',
           introDetails: 'Ich liebe es, mit Farben, Formen, Texturen und Materialien zu experimentieren. So verwende ich für die Gestaltung meiner Monoprints natürliche Materialien wie Blätter und Gräser, aber auch Alltagsgegenstände aller Art bis hin zu leeren Verpackungsmaterialien.\nDiese Bandbreite macht die Ergebnisse so vielfältig und individuell. Die einzige Konstante ist die Gelli Plate selbst mit ihrer quadratischen Form von 15 x 15 cm. Viel Spaß beim Stöbern!',
@@ -332,6 +335,8 @@
       // sort keys); translate only for display
       function tColor(name){ return translations[currentLang].colors[name] || name; }
       function tCollection(name){ return translations[currentLang].collections[name] || name; }
+      // category keys (spring, summer, …) reuse the filter-button labels
+      function tCategory(key){ return t('filter' + key.charAt(0).toUpperCase() + key.slice(1)) || key; }
       // artwork titles are derived from (German) folder names and stored as
       // the canonical/internal title on each item; translate only for
       // display when in English. Titles left out of this map (e.g. the
@@ -603,7 +608,7 @@
       // build a custom-styled select UI to replace native dropdown visuals (so hover/focus use our accent)
       const OPTION_LABEL_KEYS = {
         newest: 'sortNewest', color: 'sortColor', title: 'sortTitle',
-        spring: 'filterSpring', summer: 'filterSummer', autumn: 'filterAutumn', winter: 'filterWinter', christmas: 'filterChristmas'
+        spring: 'filterSpring', summer: 'filterSummer', autumn: 'filterAutumn', winter: 'filterWinter', christmas: 'filterChristmas', yearround: 'filterYearround'
       };
 
       function optionLabel(value){
@@ -1117,7 +1122,8 @@
         'Feuerblume': ['spring', 'summer', 'autumn'],
         'Feuergras': ['spring', 'summer', 'autumn', 'winter'],
         'Feuervogel': ['spring', 'summer', 'autumn'],
-        'Frame': ['spring', 'summer', 'autumn', 'winter', 'christmas'],
+        // Frame belongs to no category and is always pinned last (see render)
+        'Frame': [],
         'Frühlingsbeginn': ['spring'],
         'Frühlingswind': ['spring'],
         'Frühlingswogen': ['spring'],
@@ -1205,7 +1211,13 @@
           const override = metadataOverrides[s] || {};
           const season = override.season || inferSeason(title);
           const collection = override.collection || inferCollection(title, s);
-          const seasons = SEASON_TAGS[title] || [];
+          let seasons = SEASON_TAGS[title] || [];
+          // tagged for all four seasons in the sheet → one "year-round"
+          // category instead (it then doesn't show under the single seasons)
+          const ALL_SEASONS = ['spring', 'summer', 'autumn', 'winter'];
+          if (ALL_SEASONS.every(x => seasons.includes(x))) {
+            seasons = ['yearround', ...seasons.filter(x => !ALL_SEASONS.includes(x))];
+          }
           const folder = s.substring(0, s.lastIndexOf('/')) + '/';
           const dateKey = extractDateKey(folderImages[folder] || [s]);
           const colorName = colorKeyFromPath(s);
@@ -1327,7 +1339,7 @@
         const mode = sortSelect.value;
         // filter by season/category (an artwork can belong to several at
         // once, per Kategorien.xlsx); multi-select — an item matching ANY
-        // active filter is shown; no active filters = show everything
+        // active filter is shown; no active filters = show everything.
         let list = activeFilters.size === 0
           ? items.slice()
           : items.filter(it => (it.seasons || []).some(s => activeFilters.has(s)));
@@ -1354,6 +1366,8 @@
               return a.idx - b.idx; // original order
           }
         });
+        // "Frame" is always the last picture, regardless of sort order
+        list.sort((a,b) => (a.title === 'Frame') - (b.title === 'Frame'));
         // ensure topRow exists
         if(!topRow){
           topRow = document.createElement('div');
@@ -1431,7 +1445,8 @@
             const metaDiv = document.createElement('div'); metaDiv.className = 'meta';
             const metaParts = [];
             if (art.colorName) metaParts.push(tColor(art.colorName));
-            if (art.collection) metaParts.push(tCollection(art.collection));
+            // categories from Kategorien.xlsx (none → just the color)
+            for (const s of (art.seasons || [])) metaParts.push(tCategory(s));
             metaDiv.textContent = metaParts.join(' · ');
             const tp = document.createElement('div'); tp.className = 'phi'; tp.appendChild(titleDiv); tp.appendChild(metaDiv);
             titleCell.appendChild(tp);
