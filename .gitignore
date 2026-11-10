@@ -30,3 +30,6 @@ yarn-error.log*
 *.MP4
 *.mov
 *.MOV
+
+# built by scripts/build_site.py for deployment
+_site/

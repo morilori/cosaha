@@ -1,55 +1,59 @@
 name: Deploy to GitHub Pages
 
+# Publishes a web-sized copy of the site: scripts/build_site.py shrinks the
+# artwork photos into _site/ (originals in the repo stay untouched). Requires
+# Settings → Pages → Source = "GitHub Actions".
+
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
+# only one deploy at a time; a newer push replaces a waiting one
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-          fetch-depth: 0
-          lfs: true
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-
-      - name: Ensure Git LFS
-        run: |
-          git lfs install --local
-          git lfs pull
 
       - name: Install requirements
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt pillow
 
       - name: Regenerate folderImages.json
-        run: |
-          python3 scripts/update_artworks.py
-      - name: Configure git for deploy
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        run: python3 scripts/update_artworks.py
 
-      - name: Deploy to gh-pages branch
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Build web-sized site
+        run: python3 scripts/build_site.py --out _site
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages
-          folder: .
-          clean: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Deploy site via GitHub Actions"
-          git-config-name: "github-actions[bot]"
-          git-config-email: "41898282+github-actions[bot]@users.noreply.github.com"
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
