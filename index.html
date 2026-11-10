@@ -973,7 +973,14 @@
           modalNext.style.display = 'none';
           const wrapper = document.createElement('div');
           wrapper.style.maxWidth = '92vw';
-          wrapper.style.maxHeight = '88vh';
+          // fit between the fixed top bar and the selection bar (+ caption)
+          // — with a plain 88vh the box ran under the top bar on phones,
+          // hiding the sticky close button
+          const topBarH = document.getElementById('mobile-top-bar').offsetHeight;
+          modal.style.paddingTop = topBarH + 'px';
+          // vh first as a fallback; browsers without dvh ignore the 2nd line
+          wrapper.style.maxHeight = 'calc(100vh - ' + topBarH + 'px - var(--selection-bar-height, 4rem) - 4rem)';
+          wrapper.style.maxHeight = 'calc(100dvh - ' + topBarH + 'px - var(--selection-bar-height, 4rem) - 4rem)';
           wrapper.style.overflow = 'auto';
           wrapper.style.background = '#fff';
           wrapper.style.padding = '1rem';
@@ -1518,6 +1525,7 @@
         modal.classList.remove('open');
         modal.setAttribute('aria-hidden','true');
         modalContent.innerHTML = '';
+        modal.style.paddingTop = '';
         cap.style.display = 'none';
       }
       modal.addEventListener('click', (e)=>{
