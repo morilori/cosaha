@@ -6,7 +6,11 @@ photos to web size. The originals in Art/ are never modified — only the
 copies in _site/ are resized. Full-size phone photos (~2 MB each) pushed
 the published site past what GitHub Pages can deploy in time.
 
-Usage: python3 scripts/build_site.py [--max-size 2000] [--out _site]
+It also writes small grid thumbnails to _site/thumbs/<same path>: the grid
+shows ~100 tiles at once, and loading the 2000px photos (~1 MB each) for
+them made the page slow. The lightbox still loads the full web size.
+
+Usage: python3 scripts/build_site.py [--max-size 2000] [--thumb-size 800] [--out _site]
 """
 import argparse
 import shutil
@@ -48,6 +52,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--max-size', type=int, default=2000,
                     help='longest side of artwork photos in pixels')
+    ap.add_argument('--thumb-size', type=int, default=800,
+                    help='longest side of grid thumbnails in pixels')
     ap.add_argument('--quality', type=int, default=85)
     ap.add_argument('--out', default='_site')
     args = ap.parse_args()
@@ -67,6 +73,9 @@ def main():
         dst.parent.mkdir(parents=True, exist_ok=True)
         if rel.startswith('Art/') and src.suffix.lower() in RESIZE_EXT:
             resize(src, dst, args.max_size, args.quality)
+            thumb = out / 'thumbs' / rel
+            thumb.parent.mkdir(parents=True, exist_ok=True)
+            resize(src, thumb, args.thumb_size, 75)
             resized += 1
         else:
             shutil.copy2(src, dst)

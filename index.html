@@ -1258,13 +1258,23 @@
       // adds little (the thumbnail is already nearly full width), so
       // instead of opening it, show prev/next arrows on the thumbnail
       // itself and let it be swiped between an artwork's photos in place
+      // grid tiles load a small thumbnail (thumbs/<path>, written by
+      // scripts/build_site.py on deploy) instead of the full photo; the
+      // lightbox still shows the full size. Locally (start.sh) there are no
+      // thumbs, so fall back to the original once if the thumbnail 404s.
+      function setThumbSrc(img, src){
+        const full = encodeURI(src);
+        img.onerror = () => { img.onerror = null; img.src = full; };
+        img.src = encodeURI('thumbs/' + src);
+      }
+
       function cellFor(item, singleCol){
         const a = document.createElement('a');
         a.href = 'javascript:void(0)';
         a.className = 'cell';
         const img = document.createElement('img');
         const imgSrc = (item.src && item.src.normalize) ? item.src.normalize('NFC') : item.src;
-        img.src = encodeURI(imgSrc);
+        setThumbSrc(img, imgSrc);
         img.alt = tTitle(item.title);
         img.loading = 'lazy';
         img.draggable = false;
@@ -1278,7 +1288,7 @@
             const showAt = (p) => {
               pos = ((p % files.length) + files.length) % files.length;
               const s = (files[pos] && files[pos].normalize) ? files[pos].normalize('NFC') : files[pos];
-              img.src = encodeURI(s);
+              setThumbSrc(img, s);
             };
             const prevBtn = document.createElement('button');
             prevBtn.type = 'button'; prevBtn.className = 'cell-nav cell-nav-prev'; prevBtn.textContent = '◀';
