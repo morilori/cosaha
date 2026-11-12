@@ -1091,22 +1091,6 @@
 
       let items = [];
 
-      // photos are named with an embedded capture timestamp (YYYYMMDD_HHMMSS,
-      // e.g. "37_20260220_103421_Rosenblätter.jpg"); use the earliest one found
-      // among an artwork's files as its creation date for "Newest" sorting.
-      function extractDateKey(paths){
-        const re = /(\d{8})_(\d{6})/;
-        let best = null;
-        for(const p of (paths || [])){
-          const m = re.exec(p);
-          if(m){
-            const key = m[1] + m[2];
-            if(best === null || key < best) best = key;
-          }
-        }
-        return best;
-      }
-
       // multi-category tags per artwork, from Kategorien.xlsx — unlike
       // `season` (a single inferred value from the title), a piece can
       // belong to several of these at once. Keyed by the exact title
@@ -1235,8 +1219,6 @@
           if (ALL_SEASONS.every(x => seasons.includes(x))) {
             seasons = ['yearround', ...seasons.filter(x => !ALL_SEASONS.includes(x))];
           }
-          const folder = s.substring(0, s.lastIndexOf('/')) + '/';
-          const dateKey = extractDateKey(folderImages[folder] || [s]);
           const colorName = colorKeyFromPath(s);
           return {
             idx,
@@ -1245,8 +1227,7 @@
             season,
             collection,
             seasons,
-            colorName,
-            dateKey
+            colorName
           };
         });
       }
@@ -1372,12 +1353,11 @@
           : items.filter(it => (it.seasons || []).some(s => activeFilters.has(s)));
         list.sort((a,b)=>{
           switch(mode){
-            case 'newest': {
-              const ak = a.dateKey || '';
-              const bk = b.dateKey || '';
-              if(ak !== bk) return ak < bk ? 1 : -1;
+            case 'newest':
+              // highest number from Gelli-Tabelle first — idx follows the
+              // folder's leading number (the table's chronological "Nr."),
+              // so photo dates (re-shot pieces) no longer reorder the grid
               return b.idx - a.idx;
-            }
             case 'title':
               return a.title.localeCompare(b.title, undefined, {sensitivity:'base'});
             case 'color': {
